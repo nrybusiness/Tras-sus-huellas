@@ -172,7 +172,7 @@
       </div>
     );
 
-    const PetCard = ({ pet }) => {
+    const PetCard = ({ pet, onOpenDetail }) => {
       const categoriaConfig = {
         perdido: { bg: 'bg-[#D9534F]', text: 'PERDIDO', icon: '🔴' },
         avistamiento: { bg: 'bg-[#E6A017]', text: 'AVISTADO', icon: '🟡' },
@@ -182,8 +182,17 @@
       const cat = categoriaConfig[pet.categoria] || { bg: 'bg-gray-500', text: pet.categoria?.toUpperCase(), icon: '📌' };
       const whatsappText = `Hola, vi el reporte de ${pet.nombre || 'esta mascota'} (${cat.text}) en Tras Sus Huellas. ¿Podemos ayudar?`;
       
+      const handleCardClick = (e) => {
+        // Evitar que se abra el detalle si se hizo clic en el botón de contacto
+        if (e.target.closest('a')) return;
+        onOpenDetail(pet);
+      };
+
       return (
-        <div className="bg-white rounded-2xl overflow-hidden border border-[#E07A5F]/10 shadow-soft hover:shadow-md transition-all duration-200">
+        <div 
+          className="bg-white rounded-2xl overflow-hidden border border-[#E07A5F]/10 shadow-soft hover:shadow-md transition-all duration-200 cursor-pointer"
+          onClick={handleCardClick}
+        >
           <div className="relative aspect-square bg-[#FEF3E7]">
             {pet.foto ? <img src={pet.foto} alt={pet.nombre} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-6xl">{pet.especie==='perro'?'🐕':pet.especie==='gato'?'🐈':'🐾'}</div>}
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-3">
@@ -203,9 +212,97 @@
               <p className="text-xs text-[#8B7A6B] mb-2 italic">"{pet.descripcion.length > 50 ? pet.descripcion.substring(0,50)+'…' : pet.descripcion}"</p>
             )}
             <p className="text-[10px] text-[#8B7A6B] mb-2">{formatDate(pet.fecha)}</p>
-            <a href={getWhatsAppLink(pet.contactoTelefono, whatsappText)} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-1 w-full bg-[#E07A5F] hover:bg-[#C86A50] text-white text-sm font-medium py-2 rounded-full transition-colors shadow-sm">
+            <a 
+              href={getWhatsAppLink(pet.contactoTelefono, whatsappText)} 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="flex items-center justify-center gap-1 w-full bg-[#E07A5F] hover:bg-[#C86A50] text-white text-sm font-medium py-2 rounded-full transition-colors shadow-sm"
+            >
               <span>🧡</span> Contactar
             </a>
+          </div>
+        </div>
+      );
+    };
+
+    const DetailView = ({ pet, onClose }) => {
+      const categoriaConfig = {
+        perdido: { bg: 'bg-[#D9534F]', text: 'PERDIDO', icon: '🔴' },
+        avistamiento: { bg: 'bg-[#E6A017]', text: 'AVISTADO', icon: '🟡' },
+        urgencia: { bg: 'bg-[#B91C1C]', text: '🚨 URGENTE', icon: '🚨' },
+        adopcion: { bg: 'bg-[#15803D]', text: '🏠 ADOPCIÓN', icon: '🏠' }
+      };
+      const cat = categoriaConfig[pet.categoria] || { bg: 'bg-gray-500', text: pet.categoria?.toUpperCase(), icon: '📌' };
+      const whatsappText = `Hola, vi el reporte de ${pet.nombre || 'esta mascota'} (${cat.text}) en Tras Sus Huellas. ¿Podemos ayudar?`;
+
+      return (
+        <div className="fixed inset-0 z-50 bg-[#FFF9F2] overflow-auto" onClick={onClose}>
+          <div className="min-h-screen flex items-center justify-center p-4" onClick={e => e.stopPropagation()}>
+            <div className="bg-white rounded-3xl shadow-lg max-w-lg w-full overflow-hidden border border-[#E07A5F]/20">
+              <div className="relative aspect-video bg-[#FEF3E7]">
+                {pet.foto ? (
+                  <img src={pet.foto} alt={pet.nombre} className="w-full h-full object-contain" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-8xl">
+                    {pet.especie==='perro'?'🐕':pet.especie==='gato'?'🐈':'🐾'}
+                  </div>
+                )}
+                <button 
+                  onClick={onClose}
+                  className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center text-[#4A3B32] shadow-md"
+                >
+                  &times;
+                </button>
+                <span className={`absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-medium text-white ${cat.bg}`}>
+                  {cat.text}
+                </span>
+              </div>
+              <div className="p-5">
+                <div className="flex justify-between items-start mb-3">
+                  <h2 className="text-2xl font-display text-[#4A3B32]">{pet.nombre || 'Sin nombre'}</h2>
+                  <span className="text-sm text-[#8B7A6B]">{formatDate(pet.fecha)}</span>
+                </div>
+                
+                <div className="space-y-3 mb-5">
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg">{pet.especie==='perro'?'🐕':pet.especie==='gato'?'🐈':'🐾'}</span>
+                    <span className="font-medium">{pet.raza || 'Raza no especificada'}</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div className="bg-[#FEF3E7] p-2 rounded-xl">
+                      <span className="text-[#8B7A6B]">Color:</span> {pet.color || '—'}
+                    </div>
+                    <div className="bg-[#FEF3E7] p-2 rounded-xl">
+                      <span className="text-[#8B7A6B]">Tamaño:</span> {pet.tamaño || '—'}
+                    </div>
+                  </div>
+                  <div className="bg-[#FEF3E7] p-3 rounded-xl">
+                    <span className="text-[#8B7A6B] block mb-1">📍 Zona</span>
+                    <span className="font-medium">{pet.zona}</span>
+                  </div>
+                  {pet.descripcion && (
+                    <div className="bg-[#FEF3E7] p-3 rounded-xl">
+                      <span className="text-[#8B7A6B] block mb-1">📝 Descripción</span>
+                      <p className="text-sm whitespace-pre-wrap">{pet.descripcion}</p>
+                    </div>
+                  )}
+                  <div className="bg-[#FEF3E7] p-3 rounded-xl">
+                    <span className="text-[#8B7A6B] block mb-1">📞 Contacto</span>
+                    <p className="font-medium">{pet.contactoNombre}</p>
+                    <p className="text-sm text-[#8B7A6B]">{pet.contactoTelefono}</p>
+                  </div>
+                </div>
+
+                <a
+                  href={getWhatsAppLink(pet.contactoTelefono, whatsappText)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 w-full bg-[#E07A5F] hover:bg-[#C86A50] text-white font-display text-base py-3 rounded-full shadow-md transition"
+                >
+                  <span>🧡</span> Contactar por WhatsApp
+                </a>
+              </div>
+            </div>
           </div>
         </div>
       );
@@ -216,6 +313,7 @@
       const [filters, setFilters] = useState({ especie: 'todos', categoria: 'todas', zona: 'todas' });
       const [loading, setLoading] = useState(true);
       const [error, setError] = useState(false);
+      const [selectedPet, setSelectedPet] = useState(null);
 
       const loadData = useCallback(async () => {
         setLoading(true);
@@ -253,19 +351,24 @@
       if (error) return <div className="text-center py-12 text-[#8B7A6B]">⚠️ No pudimos cargar los datos.</div>;
 
       return (
-        <div className="max-w-7xl mx-auto px-3 pt-2 pb-24">
-          <FilterBar filters={filters} setFilters={setFilters} />
-          {filtered.length === 0 ? (
-            <div className="text-center py-10 bg-white rounded-2xl shadow-soft p-6">
-              <span className="text-4xl mb-3 block">🐾</span>
-              <p className="text-[#8B7A6B]">Aún no hay reportes.</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {filtered.map(pet => <PetCard key={pet.id} pet={pet} />)}
-            </div>
-          )}
-        </div>
+        <>
+          <div className="max-w-7xl mx-auto px-3 pt-2 pb-24">
+            <FilterBar filters={filters} setFilters={setFilters} />
+            {filtered.length === 0 ? (
+              <div className="text-center py-10 bg-white rounded-2xl shadow-soft p-6">
+                <span className="text-4xl mb-3 block">🐾</span>
+                <p className="text-[#8B7A6B]">Aún no hay reportes.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {filtered.map(pet => (
+                  <PetCard key={pet.id} pet={pet} onOpenDetail={setSelectedPet} />
+                ))}
+              </div>
+            )}
+          </div>
+          {selectedPet && <DetailView pet={selectedPet} onClose={() => setSelectedPet(null)} />}
+        </>
       );
     };
 
@@ -275,7 +378,7 @@
         type: 'perdido',
         nombre: '', especie: 'perro', raza: '', color: '', tamaño: 'mediano',
         zona: 'Medellín Centro', descripcion: '', foto: '',
-        contactoNombre: '', contactoTelefono: '',
+        contactoNombre: '', contactoTelefonoLocal: '', // NUEVO: solo la parte local
         fecha: new Date().toISOString().split('T')[0]
       });
       const [preview, setPreview] = useState(null);
@@ -299,15 +402,30 @@
       };
       
       const validate = () => {
-        if (!form.zona || !form.contactoNombre || !form.contactoTelefono) { setError('Zona, nombre y teléfono son obligatorios'); return false; }
-        setError(''); return true;
+        if (!form.zona || !form.contactoNombre || !form.contactoTelefonoLocal) { 
+          setError('Zona, nombre y teléfono son obligatorios'); 
+          return false; 
+        }
+        setError(''); 
+        return true;
       };
       
       const submit = async (e) => {
-        e.preventDefault(); if (!validate()) return;
+        e.preventDefault(); 
+        if (!validate()) return;
         setSending(true);
         setError('');
-        const payload = { action: 'reportar', type: form.type, data: { ...form } };
+        // Construir teléfono completo con +57
+        const telefonoCompleto = '+57' + form.contactoTelefonoLocal.replace(/\D/g, '');
+        const payload = { 
+          action: 'reportar', 
+          type: form.type, 
+          data: { 
+            ...form, 
+            contactoTelefono: telefonoCompleto,
+            contactoTelefonoLocal: undefined // No enviar el campo local
+          } 
+        };
         try {
           const res = await fetch(GAS_URL, { method: 'POST', headers: {'Content-Type':'text/plain'}, body: JSON.stringify(payload) });
           const json = await res.json();
@@ -317,7 +435,7 @@
             setTimeout(() => {
               setForm({
                 categoria: 'perdido', type: 'perdido', nombre: '', especie: 'perro', raza: '', color: '', tamaño: 'mediano',
-                zona: 'Medellín Centro', descripcion: '', foto: '', contactoNombre: '', contactoTelefono: '',
+                zona: 'Medellín Centro', descripcion: '', foto: '', contactoNombre: '', contactoTelefonoLocal: '',
                 fecha: new Date().toISOString().split('T')[0]
               });
               setPreview(null);
@@ -388,7 +506,16 @@
                 <div><label className="block mb-1 text-xs font-medium text-[#8B7A6B]">📸 Foto</label><input type="file" accept="image/*" onChange={handleImage} disabled={processing} className="block w-full text-xs file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:bg-[#E07A5F] file:text-white" />{preview && <img src={preview} className="mt-2 w-24 h-24 object-cover rounded-xl border border-[#E07A5F]/20" />}</div>
                 <div className="grid grid-cols-2 gap-2">
                   <input placeholder="Tu nombre *" value={form.contactoNombre} onChange={e=>handleChange('contactoNombre',e.target.value)} className="bg-[#FFF9F2] border border-[#E07A5F]/20 rounded-full px-3 py-2 text-sm" required />
-                  <input placeholder="Teléfono (+57) *" value={form.contactoTelefono} onChange={e=>handleChange('contactoTelefono',e.target.value)} className="bg-[#FFF9F2] border border-[#E07A5F]/20 rounded-full px-3 py-2 text-sm" required />
+                  <div className="relative">
+                    <input 
+                      placeholder="Número local *" 
+                      value={form.contactoTelefonoLocal} 
+                      onChange={e=>handleChange('contactoTelefonoLocal', e.target.value)} 
+                      className="w-full bg-[#FFF9F2] border border-[#E07A5F]/20 rounded-full pl-12 pr-3 py-2 text-sm" 
+                      required 
+                    />
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8B7A6B] font-medium text-sm">+57</span>
+                  </div>
                 </div>
                 <input type="date" value={form.fecha} onChange={e=>handleChange('fecha',e.target.value)} className="w-full bg-[#FFF9F2] border border-[#E07A5F]/20 rounded-full px-4 py-2 text-sm" />
                 {error && <p className="text-[#D9534F] text-xs">{error}</p>}
