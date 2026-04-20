@@ -62,8 +62,6 @@
     // ⚠️ REEMPLAZAR CON LA URL DE TU WEB APP DE GAS
     const GAS_URL = 'https://script.google.com/macros/s/AKfycbwIjj7RQWHhYUTxPYzDoVaghh8LLngV5EFWVX_WZyIyRS44LBNm3z33niQhPbQPjYPE/exec';
 
-    // Datos mock ELIMINADOS — solo reales desde backend
-
     const ZONAS = ['Medellín Centro','El Poblado','Laureles-Estadio','Belén','Robledo','Envigado','Itagüí','Sabaneta','Bello','Copacabana','La Estrella','Caldas','Barbosa','Girardota'];
 
     const formatDate = (dateStr) => {
@@ -94,7 +92,7 @@
       reader.readAsDataURL(file);
     });
 
-    // ---------- COMPONENTES OPTIMIZADOS PARA MÓVIL ----------
+    // ---------- COMPONENTES ----------
     const Header = () => (
       <header className="sticky top-0 z-20 bg-white/80 backdrop-blur-md border-b border-[#E07A5F]/20 px-3 py-2 shadow-soft">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
@@ -268,12 +266,14 @@
       );
     };
 
+    // ---------- REPORTFORM CON CONFIRMACIÓN DE ÉXITO ----------
     const ReportForm = ({ onMatchFound }) => {
       const [form, setForm] = useState({ type:'perdido', nombre:'', especie:'perro', raza:'', color:'Dorado', tamaño:'mediano', zona:'Medellín Centro', descripcion:'', foto:'', contactoNombre:'', contactoTelefono:'', fecha: new Date().toISOString().split('T')[0] });
       const [preview, setPreview] = useState(null);
       const [sending, setSending] = useState(false);
       const [processing, setProcessing] = useState(false);
       const [error, setError] = useState('');
+      const [success, setSuccess] = useState(false);
 
       const handleChange = (field, value) => setForm(prev => ({...prev, [field]: value}));
       const handleImage = async (e) => {
@@ -288,25 +288,43 @@
       const submit = async (e) => {
         e.preventDefault(); if (!validate()) return;
         setSending(true);
+        setError('');
         const payload = { action: 'reportar', type: form.type, data: { ...form } };
-        if (GAS_URL) {
-          try {
-            const res = await fetch(GAS_URL, { method: 'POST', headers: {'Content-Type':'text/plain'}, body: JSON.stringify(payload) });
-            const json = await res.json();
-            if (json.ok) {
-              onMatchFound({ reporte: payload.data, matches: json.matches || [] });
-              // Resetear formulario (opcional)
-            } else {
-              alert('Error al enviar reporte');
-            }
-          } catch(e) {
-            alert('Error de conexión');
+        try {
+          const res = await fetch(GAS_URL, { method: 'POST', headers: {'Content-Type':'text/plain'}, body: JSON.stringify(payload) });
+          const json = await res.json();
+          if (json.ok) {
+            setSuccess(true);
+            onMatchFound({ reporte: payload.data, matches: json.matches || [] });
+            // Reiniciar formulario después de 3 segundos
+            setTimeout(() => {
+              setForm({ type:'perdido', nombre:'', especie:'perro', raza:'', color:'Dorado', tamaño:'mediano', zona:'Medellín Centro', descripcion:'', foto:'', contactoNombre:'', contactoTelefono:'', fecha: new Date().toISOString().split('T')[0] });
+              setPreview(null);
+              setSuccess(false);
+            }, 3000);
+          } else {
+            setError(json.error || 'Error en el servidor. Intenta de nuevo.');
           }
-        } else {
-          alert('Backend no configurado');
+        } catch (err) {
+          setError('Error de conexión. Verifica tu internet.');
+        } finally {
+          setSending(false);
         }
-        setSending(false);
       };
+
+      if (success) {
+        return (
+          <div className="max-w-lg mx-auto px-3 py-10 text-center">
+            <div className="bg-white rounded-2xl p-8 shadow-soft border border-[#E07A5F]/20">
+              <span className="text-6xl mb-4 block">✅</span>
+              <h3 className="text-2xl font-display text-[#4A3B32] mb-2">¡Reporte enviado!</h3>
+              <p className="text-[#8B7A6B] mb-4">Gracias por ayudar a que vuelvan a casa.</p>
+              <p className="text-sm text-[#8B7A6B]">Redirigiendo al inicio...</p>
+            </div>
+          </div>
+        );
+      }
+
       return (
         <div className="max-w-lg mx-auto px-3 py-4">
           <h2 className="text-2xl font-display mb-3 text-[#4A3B32] flex items-center gap-2"><span>📋</span> Reportar mascota</h2>
@@ -335,7 +353,9 @@
               <input type="date" value={form.fecha} onChange={e=>handleChange('fecha',e.target.value)} className="w-full bg-[#FFF9F2] border border-[#E07A5F]/20 rounded-full px-4 py-2 text-sm" />
               {error && <p className="text-[#D9534F] text-xs">{error}</p>}
             </div>
-            <button type="submit" disabled={sending||processing} className="w-full bg-[#E07A5F] hover:bg-[#C86A50] text-white font-display text-base py-3 rounded-full shadow-md transition flex items-center justify-center gap-2">✨ Publicar reporte</button>
+            <button type="submit" disabled={sending||processing} className="w-full bg-[#E07A5F] hover:bg-[#C86A50] text-white font-display text-base py-3 rounded-full shadow-md transition flex items-center justify-center gap-2">
+              {sending ? 'Enviando...' : '✨ Publicar reporte'}
+            </button>
           </form>
         </div>
       );
