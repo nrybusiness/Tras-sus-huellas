@@ -69,7 +69,7 @@
   <script type="text/babel">
     const { useState, useEffect, useCallback, useMemo } = React;
 
-    // ⚠️ REEMPLAZAR CON LA URL DE TU WEB APP DE GAS
+    // ⚠️ PEGA AQUÍ LA URL DE TU WEB APP DE GAS (backend de mascotas)
     const GAS_URL = 'https://script.google.com/macros/s/AKfycbwIjj7RQWHhYUTxPYzDoVaghh8LLngV5EFWVX_WZyIyRS44LBNm3z33niQhPbQPjYPE/exec';
 
     // Mocks de ejemplo (funcionan aunque no haya backend)
@@ -121,58 +121,262 @@
       reader.readAsDataURL(file);
     });
 
-    const Header = () => ( /* ... igual que antes ... */ );
-    const HeroSection = ({ stats }) => ( /* ... */ );
-    const TabNavigator = ({ activeTab, setActiveTab }) => ( /* ... */ );
-    const FilterBar = ({ filters, setFilters }) => ( /* ... */ );
-    const PetCard = ({ pet }) => ( /* ... */ );
-    const FeedView = ({ type }) => { /* ... usa GAS_URL y MOCK_PETS ... */ };
-    const ReportForm = ({ onMatchFound }) => { /* ... incluye resizeImage y fetch con text/plain ... */ };
-    const MatchView = ({ reporte, matches, onClose }) => ( /* ... */ );
-    const HowItWorks = () => ( /* ... */ );
-    const Footer = () => ( /* ... */ );
+    // ---------- COMPONENTES ----------
+    const Header = () => (
+      <header className="sticky top-0 z-20 bg-tsh-surface/95 backdrop-blur-sm border-b border-tsh-border px-4 py-3">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-2xl">🐾</span>
+            <h1 className="text-xl font-display tracking-tight">Tras Sus <span className="text-tsh-accent">Huellas</span></h1>
+          </div>
+          <span className="bg-tsh-surface-2 px-3 py-1 rounded-full text-xs font-mono border border-tsh-teal/30 text-tsh-teal">Valle de Aburrá</span>
+        </div>
+      </header>
+    );
+
+    const HeroSection = ({ stats }) => (
+      <section className="px-4 py-8 max-w-7xl mx-auto">
+        <div className="text-center md:text-left md:flex md:justify-between md:items-end">
+          <div>
+            <h2 className="text-3xl md:text-4xl font-display leading-tight mb-2">Reencuentros que <br/><span className="text-tsh-accent">cambian vidas</span></h2>
+            <p className="text-tsh-muted text-lg max-w-xl">Reporta mascotas perdidas o avistadas en Medellín y el Valle de Aburrá.</p>
+          </div>
+          <div className="mt-6 md:mt-0 flex justify-center gap-6">
+            <div className="text-center"><div className="text-2xl font-display text-tsh-accent">{stats.totalPerdidos}</div><div className="text-xs text-tsh-muted">Perdidos</div></div>
+            <div className="text-center"><div className="text-2xl font-display text-tsh-warning">{stats.totalAvistamientos}</div><div className="text-xs text-tsh-muted">Avistamientos</div></div>
+            <div className="text-center"><div className="text-2xl font-display text-tsh-success">{stats.resueltos}</div><div className="text-xs text-tsh-muted">Reencuentros</div></div>
+          </div>
+        </div>
+      </section>
+    );
+
+    const TabNavigator = ({ activeTab, setActiveTab }) => {
+      const tabs = [
+        { id: 'perdidos', label: 'Perdidos', icon: '🔴' },
+        { id: 'avistamientos', label: 'Encontrados', icon: '🟡' },
+        { id: 'reportar', label: 'Reportar', icon: '📝' }
+      ];
+      return (
+        <div className="border-b border-tsh-border">
+          <div className="max-w-7xl mx-auto px-4 flex gap-1">
+            {tabs.map(tab => (
+              <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`px-5 py-3 text-sm font-medium transition-all flex items-center gap-1 border-b-2 ${activeTab === tab.id ? 'border-tsh-accent text-tsh-accent' : 'border-transparent text-tsh-muted hover:text-tsh-text'}`}>
+                <span>{tab.icon}</span> {tab.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      );
+    };
+
+    const FilterBar = ({ filters, setFilters }) => (
+      <div className="bg-tsh-surface p-4 rounded-xl mb-4 flex flex-wrap gap-3 items-end">
+        <div className="flex-1 min-w-[120px]">
+          <label className="block text-xs text-tsh-muted mb-1">Especie</label>
+          <select className="w-full bg-tsh-surface-2 border border-tsh-border rounded-lg px-3 py-2 text-sm" value={filters.especie} onChange={(e) => setFilters({...filters, especie: e.target.value})}>
+            <option value="todos">Todos</option><option value="perro">Perros</option><option value="gato">Gatos</option><option value="otro">Otros</option>
+          </select>
+        </div>
+        <div className="flex-1 min-w-[160px]">
+          <label className="block text-xs text-tsh-muted mb-1">Zona</label>
+          <select className="w-full bg-tsh-surface-2 border border-tsh-border rounded-lg px-3 py-2 text-sm" value={filters.zona} onChange={(e) => setFilters({...filters, zona: e.target.value})}>
+            <option value="todas">Todas</option>
+            {ZONAS.map(z => <option key={z} value={z}>{z}</option>)}
+          </select>
+        </div>
+        <div className="flex-1 min-w-[120px]">
+          <label className="block text-xs text-tsh-muted mb-1">Ordenar</label>
+          <select className="w-full bg-tsh-surface-2 border border-tsh-border rounded-lg px-3 py-2 text-sm" value={filters.sort} onChange={(e) => setFilters({...filters, sort: e.target.value})}>
+            <option value="recientes">Más recientes</option><option value="antiguos">Más antiguos</option>
+          </select>
+        </div>
+      </div>
+    );
+
+    const PetCard = ({ pet }) => {
+      const text = `Hola, vi tu reporte de ${pet.nombre || 'mascota'} en Tras Sus Huellas. ¿Podemos hablar?`;
+      return (
+        <div className="bg-tsh-surface rounded-2xl overflow-hidden border border-tsh-border hover:border-tsh-accent/30 transition-all">
+          <div className="aspect-square bg-tsh-surface-2 flex items-center justify-center text-5xl">
+            {pet.foto ? <img src={pet.foto} alt={pet.nombre} className="w-full h-full object-cover" /> : getPetEmoji(pet.especie)}
+          </div>
+          <div className="p-4">
+            <div className="flex justify-between items-start mb-2">
+              <h3 className="font-display text-lg">{pet.nombre || 'Sin nombre'}</h3>
+              {statusBadge(pet.estado)}
+            </div>
+            <div className="flex flex-wrap gap-1 text-xs text-tsh-muted mb-2">
+              <span className="bg-tsh-surface-2 px-2 py-0.5 rounded">{pet.raza}</span>
+              <span className="bg-tsh-surface-2 px-2 py-0.5 rounded">{pet.color}</span>
+              <span className="bg-tsh-surface-2 px-2 py-0.5 rounded">{pet.tamaño}</span>
+            </div>
+            <p className="text-sm text-tsh-muted mb-1">📍 {pet.zona}</p>
+            <p className="text-xs text-tsh-muted mb-3">{formatDate(pet.fecha)}</p>
+            <a href={getWhatsAppLink(pet.contactoTelefono, text)} target="_blank" rel="noopener noreferrer" className="block w-full text-center bg-tsh-accent hover:bg-tsh-accent-soft text-white font-medium py-2 rounded-lg transition-colors text-sm">Contactar por WhatsApp</a>
+          </div>
+        </div>
+      );
+    };
+
+    const FeedView = ({ type }) => {
+      const [pets, setPets] = useState([]);
+      const [filters, setFilters] = useState({ especie: 'todos', zona: 'todas', sort: 'recientes' });
+      const [loading, setLoading] = useState(true);
+
+      const loadData = useCallback(async () => {
+        setLoading(true);
+        if (GAS_URL) {
+          try {
+            const res = await fetch(`${GAS_URL}?action=feed&type=${type}`);
+            const json = await res.json();
+            if (json.ok) { setPets(json.data); setLoading(false); return; }
+          } catch(e) {}
+        }
+        setPets(MOCK_PETS.filter(p => type === 'perdidos' ? p.type === 'perdido' : p.type === 'avistamiento'));
+        setLoading(false);
+      }, [type]);
+
+      useEffect(() => { loadData(); }, [loadData]);
+
+      const filtered = useMemo(() => {
+        let f = [...pets];
+        if (filters.especie !== 'todos') f = f.filter(p => p.especie === filters.especie);
+        if (filters.zona !== 'todas') f = f.filter(p => p.zona === filters.zona);
+        f.sort((a,b) => filters.sort === 'recientes' ? new Date(b.fecha) - new Date(a.fecha) : new Date(a.fecha) - new Date(b.fecha));
+        return f;
+      }, [pets, filters]);
+
+      return (
+        <div className="max-w-7xl mx-auto px-4 py-6">
+          <FilterBar filters={filters} setFilters={setFilters} />
+          {loading ? <div className="text-center py-12 text-tsh-muted">Cargando...</div> : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {filtered.map(pet => <PetCard key={pet.id} pet={pet} />)}
+            </div>
+          )}
+        </div>
+      );
+    };
+
+    const ReportForm = ({ onMatchFound }) => {
+      const [form, setForm] = useState({ type:'perdido', nombre:'', especie:'perro', raza:'', color:'Negro', tamaño:'mediano', zona:'Medellín Centro', descripcion:'', foto:'', contactoNombre:'', contactoTelefono:'', fecha: new Date().toISOString().split('T')[0] });
+      const [preview, setPreview] = useState(null);
+      const [sending, setSending] = useState(false);
+      const [processing, setProcessing] = useState(false);
+      const [error, setError] = useState('');
+
+      const handleChange = (field, value) => setForm(prev => ({...prev, [field]: value}));
+      const handleImage = async (e) => {
+        const file = e.target.files[0]; if (!file) return;
+        setProcessing(true);
+        try { const b64 = await resizeImage(file); setPreview(b64); handleChange('foto', b64); } catch(e) { alert('Error con imagen'); } finally { setProcessing(false); }
+      };
+      const validate = () => {
+        if (!form.zona || !form.contactoNombre || !form.contactoTelefono) { setError('Zona, nombre y teléfono obligatorios'); return false; }
+        setError(''); return true;
+      };
+      const submit = async (e) => {
+        e.preventDefault(); if (!validate()) return;
+        setSending(true);
+        const payload = { action: 'reportar', type: form.type, data: { nombre: form.nombre, especie: form.especie, raza: form.raza, color: form.color, tamaño: form.tamaño, zona: form.zona, descripcion: form.descripcion, foto: form.foto, contactoNombre: form.contactoNombre, contactoTelefono: form.contactoTelefono, fecha: form.fecha } };
+        if (GAS_URL) {
+          try {
+            const res = await fetch(GAS_URL, { method: 'POST', headers: {'Content-Type':'text/plain'}, body: JSON.stringify(payload) });
+            const json = await res.json();
+            if (json.ok) onMatchFound({ reporte: payload.data, matches: json.matches || [] });
+            else alert('Reporte enviado (backend simulado)');
+          } catch(e) {
+            const mockMatches = [{ id: 'P-0001', score: 85, pet: MOCK_PETS[0] }];
+            onMatchFound({ reporte: payload.data, matches: mockMatches });
+          }
+        } else {
+          onMatchFound({ reporte: payload.data, matches: [{ id: 'P-0001', score: 85, pet: MOCK_PETS[0] }] });
+        }
+        setSending(false);
+      };
+      return (
+        <div className="max-w-2xl mx-auto px-4 py-6">
+          <h2 className="text-2xl font-display mb-6">Reportar mascota</h2>
+          <form onSubmit={submit} className="space-y-6">
+            <div className="flex gap-4">
+              <button type="button" onClick={()=>handleChange('type','perdido')} className={`flex-1 py-3 rounded-xl border ${form.type==='perdido'?'border-tsh-accent bg-tsh-accent/10':'border-tsh-border'}`}>🔴 Perdí mi mascota</button>
+              <button type="button" onClick={()=>handleChange('type','avistamiento')} className={`flex-1 py-3 rounded-xl border ${form.type==='avistamiento'?'border-tsh-accent bg-tsh-accent/10':'border-tsh-border'}`}>🟡 Vi una mascota perdida</button>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <input placeholder="Nombre" value={form.nombre} onChange={e=>handleChange('nombre',e.target.value)} className="bg-tsh-surface-2 border border-tsh-border rounded-lg px-4 py-3" />
+              <select value={form.especie} onChange={e=>handleChange('especie',e.target.value)} className="bg-tsh-surface-2 border border-tsh-border rounded-lg px-4 py-3"><option>perro</option><option>gato</option><option>otro</option></select>
+              <input placeholder="Raza" value={form.raza} onChange={e=>handleChange('raza',e.target.value)} className="bg-tsh-surface-2 border border-tsh-border rounded-lg px-4 py-3" list="razas" />
+              <datalist id="razas"><option>Criollo</option><option>Labrador</option><option>Poodle</option><option>Bulldog</option><option>Persa</option><option>Siames</option></datalist>
+              <select value={form.color} onChange={e=>handleChange('color',e.target.value)} className="bg-tsh-surface-2 border border-tsh-border rounded-lg px-4 py-3"><option>Negro</option><option>Blanco</option><option>Café</option><option>Dorado</option><option>Gris</option><option>Manchado</option></select>
+              <select value={form.tamaño} onChange={e=>handleChange('tamaño',e.target.value)} className="bg-tsh-surface-2 border border-tsh-border rounded-lg px-4 py-3"><option>pequeño</option><option>mediano</option><option>grande</option></select>
+              <select value={form.zona} onChange={e=>handleChange('zona',e.target.value)} className="bg-tsh-surface-2 border border-tsh-border rounded-lg px-4 py-3 md:col-span-2">{ZONAS.map(z=><option key={z}>{z}</option>)}</select>
+              <textarea placeholder="Descripción" value={form.descripcion} onChange={e=>handleChange('descripcion',e.target.value)} className="bg-tsh-surface-2 border border-tsh-border rounded-lg px-4 py-3 md:col-span-2" rows="3"></textarea>
+            </div>
+            <div><label className="block mb-2 text-sm">Foto</label><input type="file" accept="image/*" onChange={handleImage} disabled={processing} className="block w-full text-sm text-tsh-muted file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-tsh-accent file:text-white" />{processing && <p className="text-xs text-tsh-muted mt-1">Optimizando...</p>}{preview && <img src={preview} className="mt-3 w-32 h-32 object-cover rounded-lg border border-tsh-border" />}</div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <input placeholder="Tu nombre *" value={form.contactoNombre} onChange={e=>handleChange('contactoNombre',e.target.value)} className="bg-tsh-surface-2 border border-tsh-border rounded-lg px-4 py-3" required />
+              <input placeholder="Teléfono (+57) *" value={form.contactoTelefono} onChange={e=>handleChange('contactoTelefono',e.target.value)} className="bg-tsh-surface-2 border border-tsh-border rounded-lg px-4 py-3" required />
+            </div>
+            <input type="date" value={form.fecha} onChange={e=>handleChange('fecha',e.target.value)} className="bg-tsh-surface-2 border border-tsh-border rounded-lg px-4 py-3" />
+            {error && <p className="text-danger text-sm">{error}</p>}
+            <button type="submit" disabled={sending||processing} className="w-full bg-tsh-accent hover:bg-tsh-accent-soft text-white font-medium py-3 rounded-xl transition">Publicar reporte</button>
+          </form>
+        </div>
+      );
+    };
+
+    const MatchView = ({ reporte, matches, onClose }) => (
+      <div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50">
+        <div className="bg-tsh-surface-2 rounded-2xl max-w-2xl w-full max-h-[80vh] overflow-auto p-6">
+          <div className="flex justify-between items-center mb-4"><h3 className="text-xl font-display">🔍 Posibles coincidencias</h3><button onClick={onClose} className="text-tsh-muted text-2xl">&times;</button></div>
+          {matches.length===0 ? <p className="text-tsh-muted">No hay coincidencias aún.</p> : matches.map((m,i)=>(
+            <div key={i} className="bg-tsh-surface p-4 rounded-xl border border-tsh-border mb-4">
+              <div className="flex justify-between mb-2"><span className="font-display">{m.pet.nombre||'Mascota'}</span><span className="bg-tsh-accent/20 text-tsh-accent px-3 py-1 rounded-full text-sm">{m.score}%</span></div>
+              <div className="flex gap-4 text-sm"><div><span className="text-tsh-muted">Especie:</span> {m.pet.especie}</div><div><span className="text-tsh-muted">Zona:</span> {m.pet.zona}</div></div>
+              <a href={getWhatsAppLink(m.pet.contactoTelefono, `🐾 POSIBLE MATCH en Tras Sus Huellas\n\nVi una mascota que podría ser ${m.pet.nombre||'la tuya'}.\nZona: ${m.pet.zona}\nSimilitud: ${m.score}%\n\n¿Podemos confirmar?`)} target="_blank" className="mt-3 inline-block bg-tsh-teal text-white px-4 py-2 rounded-lg text-sm">Contactar</a>
+            </div>
+          ))}
+          <button onClick={onClose} className="mt-4 w-full border border-tsh-border py-2 rounded-lg">Cerrar</button>
+        </div>
+      </div>
+    );
+
+    const HowItWorks = () => (
+      <section className="bg-tsh-surface/50 py-12 px-4"><div className="max-w-7xl mx-auto"><h2 className="text-2xl font-display text-center mb-10">Cómo funciona</h2><div className="grid grid-cols-1 md:grid-cols-3 gap-8"><div className="text-center"><div className="text-5xl mb-4">📸</div><h3 className="font-display text-lg mb-2">Reporta</h3><p className="text-tsh-muted">Sube foto y datos</p></div><div className="text-center"><div className="text-5xl mb-4">🔍</div><h3 className="font-display text-lg mb-2">Matching</h3><p className="text-tsh-muted">Comparamos automáticamente</p></div><div className="text-center"><div className="text-5xl mb-4">💚</div><h3 className="font-display text-lg mb-2">Reencuentro</h3><p className="text-tsh-muted">Te conectamos por WhatsApp</p></div></div></div></section>
+    );
+
+    const Footer = () => (
+      <footer className="border-t border-tsh-border py-8 px-4"><div className="max-w-7xl mx-auto text-center text-tsh-muted text-sm"><p>🐾 Tras Sus Huellas · Valle de Aburrá</p><p>Proyecto social de <a href="https://rakontech.vercel.app" target="_blank" className="text-tsh-teal hover:underline">Rakon Technology</a></p><p className="mt-2">© 2026 · Medellín, Colombia · <span className="bg-tsh-surface-2 px-2 py-0.5 rounded text-xs">⚡ Powered by RAKON</span></p></div></footer>
+    );
 
     const App = () => {
       const [activeTab, setActiveTab] = useState('perdidos');
       const [stats, setStats] = useState({ totalPerdidos: 0, totalAvistamientos: 0, resueltos: 0 });
       const [matchModal, setMatchModal] = useState(null);
-
       useEffect(() => {
-        const fetchStats = async () => {
+        (async () => {
           if (GAS_URL) {
-            try {
-              const res = await fetch(`${GAS_URL}?action=stats`);
-              const json = await res.json();
-              if (json.ok) return setStats(json.data);
-            } catch(e) {}
+            try { const r = await fetch(`${GAS_URL}?action=stats`); const j = await r.json(); if (j.ok) return setStats(j.data); } catch(e) {}
           }
           setStats({ totalPerdidos: MOCK_PETS.filter(p=>p.type==='perdido').length, totalAvistamientos: MOCK_PETS.filter(p=>p.type==='avistamiento').length, resueltos: 2 });
-        };
-        fetchStats();
+        })();
       }, []);
-
       return (
         <div className="min-h-screen flex flex-col">
           <Header />
           <HeroSection stats={stats} />
           <TabNavigator activeTab={activeTab} setActiveTab={setActiveTab} />
           <main className="flex-1">
-            {activeTab === 'perdidos' && <FeedView type="perdidos" />}
-            {activeTab === 'avistamientos' && <FeedView type="avistamientos" />}
-            {activeTab === 'reportar' && <ReportForm onMatchFound={setMatchModal} />}
+            {activeTab==='perdidos' && <FeedView type="perdidos" />}
+            {activeTab==='avistamientos' && <FeedView type="avistamientos" />}
+            {activeTab==='reportar' && <ReportForm onMatchFound={setMatchModal} />}
           </main>
           <HowItWorks />
           <Footer />
-          {matchModal && <MatchView reporte={matchModal.reporte} matches={matchModal.matches} onClose={() => setMatchModal(null)} />}
+          {matchModal && <MatchView {...matchModal} onClose={()=>setMatchModal(null)} />}
         </div>
       );
     };
-
-    // (Por brevedad, los componentes internos se mantienen idénticos a la versión anterior completa que ya tienes)
-    // Asegúrate de copiar el código completo del index.html proporcionado anteriormente.
-    // La única línea a cambiar es const GAS_URL = '...';
-    // NOTA: Debido al límite de extensión, incluyo la estructura pero debes usar el archivo completo previo.
-    // En un entorno real, copia el index.html de la respuesta anterior y solo reemplaza GAS_URL.
 
     const root = ReactDOM.createRoot(document.getElementById('root'));
     root.render(<App />);
