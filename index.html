@@ -28,6 +28,7 @@
       --tsh-border: rgba(224, 122, 95, 0.15);
       --shadow-sm: 0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02);
       --shadow-md: 0 6px 16px rgba(0,0,0,0.06);
+      --shadow-lg: 0 10px 25px -5px rgba(0,0,0,0.1);
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -45,13 +46,6 @@
     ::-webkit-scrollbar { width: 4px; }
     ::-webkit-scrollbar-track { background: var(--tsh-surface-2); }
     ::-webkit-scrollbar-thumb { background: var(--tsh-accent); border-radius: 8px; }
-    @keyframes float {
-      0% { transform: translateY(0); }
-      50% { transform: translateY(-3px); }
-      100% { transform: translateY(0); }
-    }
-    .hover-float:hover { animation: float 0.4s ease-in-out; }
-    .shadow-soft { box-shadow: var(--shadow-sm); }
   </style>
 </head>
 <body class="bg-tsh-bg text-tsh-text antialiased">
@@ -92,9 +86,9 @@
       reader.readAsDataURL(file);
     });
 
-    // ---------- COMPONENTES ----------
-    const Header = () => (
-      <header className="sticky top-0 z-20 bg-white/80 backdrop-blur-md border-b border-[#E07A5F]/20 px-3 py-2 shadow-soft">
+    // ---------- COMPONENTES NUEVOS ----------
+    const Header = ({ stats }) => (
+      <header className="sticky top-0 z-20 bg-white/90 backdrop-blur-md border-b border-[#E07A5F]/20 px-3 py-2 shadow-soft">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-1">
             <span className="text-2xl">🐾</span>
@@ -102,57 +96,48 @@
               Tras Sus <span className="text-[#E07A5F]">Huellas</span>
             </h1>
           </div>
-          <span className="bg-[#FEF3E7] px-3 py-1 rounded-full text-xs font-medium text-[#8B7A6B] border border-[#E07A5F]/30">
-            📍 Valle de Aburrá
-          </span>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 text-xs">
+              <div className="text-center"><span className="font-display text-[#E07A5F]">{stats.totalPerdidos}</span><span className="ml-1 text-[#8B7A6B]">🔴</span></div>
+              <div className="text-center"><span className="font-display text-[#E6A017]">{stats.totalAvistamientos}</span><span className="ml-1 text-[#8B7A6B]">🟡</span></div>
+              <div className="text-center"><span className="font-display text-[#2D5A27]">{stats.resueltos}</span><span className="ml-1 text-[#8B7A6B]">✅</span></div>
+            </div>
+            <span className="bg-[#FEF3E7] px-2 py-0.5 rounded-full text-[10px] font-medium text-[#8B7A6B] border border-[#E07A5F]/30">
+              Valle de Aburrá
+            </span>
+          </div>
         </div>
       </header>
     );
 
-    const HeroSection = ({ stats }) => {
-      const [bienvenida, setBienvenida] = useState(null);
-      useEffect(() => {
-        if (GAS_URL) {
-          fetch(`${GAS_URL}?action=bienvenida`).then(r=>r.json()).then(d=>{ if(d.ok) setBienvenida(d.data); }).catch(()=>{});
-        }
-      }, []);
-      return (
-        <section className="px-4 py-6 max-w-7xl mx-auto">
-          <div className="text-center">
-            <h2 className="text-3xl font-display leading-tight mb-2 text-[#4A3B32]">
-              Ayudándolos a <br/><span className="text-[#E07A5F]">volver a casa</span>
-            </h2>
-            <p className="text-[#8B7A6B] text-base px-2">
-              {bienvenida ? bienvenida.mensaje : 'Conectamos reportes de mascotas perdidas y avistadas.'}
-            </p>
-          </div>
-          <div className="flex justify-around mt-6">
-            <div className="text-center"><div className="text-2xl font-display text-[#E07A5F]">{stats.totalPerdidos}</div><div className="text-xs text-[#8B7A6B]">Perdidos</div></div>
-            <div className="text-center"><div className="text-2xl font-display text-[#E6A017]">{stats.totalAvistamientos}</div><div className="text-xs text-[#8B7A6B]">Avistados</div></div>
-            <div className="text-center"><div className="text-2xl font-display text-[#2D5A27]">{stats.resueltos}</div><div className="text-xs text-[#8B7A6B]">Reencuentros</div></div>
-          </div>
-        </section>
-      );
-    };
-
-    const TabNavigator = ({ activeTab, setActiveTab }) => {
+    const BottomNavigation = ({ activeTab, setActiveTab }) => {
       const tabs = [
-        { id: 'perdidos', label: 'Perdidos', icon: '🐕' },
-        { id: 'avistamientos', label: 'Avistados', icon: '🐈' },
-        { id: 'reportar', label: 'Reportar', icon: '📋' }
+        { id: 'perdidos', label: 'Perdidos', icon: '🔴' },
+        { id: 'avistamientos', label: 'Avistados', icon: '🟡' }
       ];
       return (
-        <div className="border-b border-[#E07A5F]/20">
-          <div className="max-w-7xl mx-auto px-2 flex justify-around">
+        <div className="fixed bottom-0 left-0 right-0 z-30 bg-white/90 backdrop-blur-md border-t border-[#E07A5F]/20 px-4 py-2 safe-area-inset-bottom">
+          <div className="max-w-7xl mx-auto flex justify-around items-center">
             {tabs.map(tab => (
-              <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex-1 py-2 text-sm font-medium flex items-center justify-center gap-1 border-b-2 ${activeTab === tab.id ? 'border-[#E07A5F] text-[#E07A5F]' : 'border-transparent text-[#8B7A6B]'}`}>
-                <span className="text-base">{tab.icon}</span> <span className="hidden xs:inline">{tab.label}</span>
+              <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex flex-col items-center py-1 px-4 rounded-full transition ${activeTab === tab.id ? 'text-[#E07A5F]' : 'text-[#8B7A6B]'}`}>
+                <span className="text-xl">{tab.icon}</span>
+                <span className="text-[10px] font-medium">{tab.label}</span>
               </button>
             ))}
           </div>
         </div>
       );
     };
+
+    const FloatingActionButton = ({ setActiveTab }) => (
+      <button
+        onClick={() => setActiveTab('reportar')}
+        className="fixed bottom-20 right-5 z-40 w-14 h-14 rounded-full bg-[#E07A5F] text-white shadow-lg flex items-center justify-center text-2xl hover:bg-[#C86A50] transition-all active:scale-95"
+        style={{ boxShadow: '0 8px 20px rgba(224,122,95,0.4)' }}
+      >
+        <span>📋</span>
+      </button>
+    );
 
     const FilterBar = ({ filters, setFilters }) => (
       <div className="bg-white p-3 rounded-2xl shadow-soft mb-4 flex flex-wrap gap-2 items-end border border-[#E07A5F]/10">
@@ -181,23 +166,23 @@
     const PetCard = ({ pet }) => {
       const text = `Hola, vi el reporte de ${pet.nombre || 'esta mascota'} en Tras Sus Huellas. ¿Podemos ayudarte?`;
       return (
-        <div className="bg-white rounded-2xl overflow-hidden border border-[#E07A5F]/10 shadow-soft hover:shadow-md transition-all duration-200 hover-float">
-          <div className="aspect-square bg-[#FEF3E7] flex items-center justify-center text-5xl">
-            {pet.foto ? <img src={pet.foto} alt={pet.nombre} className="w-full h-full object-cover" /> : (pet.especie==='perro'?'🐕':'🐈')}
+        <div className="bg-white rounded-2xl overflow-hidden border border-[#E07A5F]/10 shadow-soft hover:shadow-md transition-all duration-200">
+          <div className="relative aspect-square bg-[#FEF3E7]">
+            {pet.foto ? <img src={pet.foto} alt={pet.nombre} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-6xl">{pet.especie==='perro'?'🐕':'🐈'}</div>}
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-3">
+              <h3 className="font-display text-white text-lg truncate">{pet.nombre || 'Sin nombre'}</h3>
+              <p className="text-white/80 text-xs flex items-center gap-1"><span>📍</span> {pet.zona}</p>
+            </div>
+            <span className={`absolute top-2 right-2 px-2 py-0.5 rounded-full text-[10px] font-medium ${pet.estado==='PERDIDO'?'bg-[#D9534F] text-white':'bg-[#E6A017] text-white'}`}>
+              {pet.estado}
+            </span>
           </div>
           <div className="p-3">
-            <div className="flex justify-between items-start mb-1">
-              <h3 className="font-display text-base text-[#4A3B32] truncate">{pet.nombre || 'Sin nombre'}</h3>
-              <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${pet.estado==='PERDIDO'?'bg-[#D9534F]/10 text-[#D9534F]':'bg-[#E6A017]/10 text-[#E6A017]'}`}>
-                {pet.estado}
-              </span>
-            </div>
-            <div className="flex flex-wrap gap-1 text-xs text-[#8B7A6B] mb-1">
+            <div className="flex flex-wrap gap-1 text-xs text-[#8B7A6B] mb-2">
               <span className="bg-[#FEF3E7] px-2 py-0.5 rounded-full">{pet.raza}</span>
               <span className="bg-[#FEF3E7] px-2 py-0.5 rounded-full">{pet.color}</span>
+              <span className="text-[10px] ml-auto">{formatDate(pet.fecha)}</span>
             </div>
-            <p className="text-xs text-[#8B7A6B] flex items-center gap-1"><span>📍</span> {pet.zona}</p>
-            <p className="text-[10px] text-[#8B7A6B] mb-2">{formatDate(pet.fecha)}</p>
             <a href={getWhatsAppLink(pet.contactoTelefono, text)} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-1 w-full bg-[#E07A5F] hover:bg-[#C86A50] text-white text-sm font-medium py-2 rounded-full transition-colors shadow-sm">
               <span>🧡</span> Contactar
             </a>
@@ -244,21 +229,18 @@
       }, [pets, filters]);
 
       if (loading) return <div className="text-center py-12 text-[#8B7A6B]">🐾 Cargando reportes...</div>;
-      if (error) return <div className="text-center py-12 text-[#8B7A6B]">⚠️ No pudimos cargar los datos. Intenta más tarde.</div>;
+      if (error) return <div className="text-center py-12 text-[#8B7A6B]">⚠️ No pudimos cargar los datos.</div>;
 
       return (
-        <div className="max-w-7xl mx-auto px-3 py-4">
+        <div className="max-w-7xl mx-auto px-3 pt-2 pb-24">
           <FilterBar filters={filters} setFilters={setFilters} />
           {filtered.length === 0 ? (
             <div className="text-center py-10 bg-white rounded-2xl shadow-soft p-6">
               <span className="text-4xl mb-3 block">🐾</span>
-              <p className="text-[#8B7A6B]">Aún no hay reportes {type === 'perdidos' ? 'de mascotas perdidas' : 'de avistamientos'}.</p>
-              <button onClick={() => document.querySelector('button[data-tab="reportar"]')?.click()} className="mt-4 bg-[#E07A5F] text-white px-6 py-2 rounded-full text-sm">
-                Sé el primero en reportar
-              </button>
+              <p className="text-[#8B7A6B]">Aún no hay reportes.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {filtered.map(pet => <PetCard key={pet.id} pet={pet} />)}
             </div>
           )}
@@ -266,8 +248,7 @@
       );
     };
 
-    // ---------- REPORTFORM CON CONFIRMACIÓN DE ÉXITO ----------
-    const ReportForm = ({ onMatchFound }) => {
+    const ReportForm = ({ onMatchFound, onClose }) => {
       const [form, setForm] = useState({ type:'perdido', nombre:'', especie:'perro', raza:'', color:'Dorado', tamaño:'mediano', zona:'Medellín Centro', descripcion:'', foto:'', contactoNombre:'', contactoTelefono:'', fecha: new Date().toISOString().split('T')[0] });
       const [preview, setPreview] = useState(null);
       const [sending, setSending] = useState(false);
@@ -296,17 +277,17 @@
           if (json.ok) {
             setSuccess(true);
             onMatchFound({ reporte: payload.data, matches: json.matches || [] });
-            // Reiniciar formulario después de 3 segundos
             setTimeout(() => {
               setForm({ type:'perdido', nombre:'', especie:'perro', raza:'', color:'Dorado', tamaño:'mediano', zona:'Medellín Centro', descripcion:'', foto:'', contactoNombre:'', contactoTelefono:'', fecha: new Date().toISOString().split('T')[0] });
               setPreview(null);
               setSuccess(false);
-            }, 3000);
+              onClose();
+            }, 2000);
           } else {
-            setError(json.error || 'Error en el servidor. Intenta de nuevo.');
+            setError(json.error || 'Error en el servidor');
           }
         } catch (err) {
-          setError('Error de conexión. Verifica tu internet.');
+          setError('Error de conexión');
         } finally {
           setSending(false);
         }
@@ -314,56 +295,60 @@
 
       if (success) {
         return (
-          <div className="max-w-lg mx-auto px-3 py-10 text-center">
-            <div className="bg-white rounded-2xl p-8 shadow-soft border border-[#E07A5F]/20">
-              <span className="text-6xl mb-4 block">✅</span>
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/95 p-4">
+            <div className="text-center">
+              <span className="text-7xl mb-4 block">✅</span>
               <h3 className="text-2xl font-display text-[#4A3B32] mb-2">¡Reporte enviado!</h3>
-              <p className="text-[#8B7A6B] mb-4">Gracias por ayudar a que vuelvan a casa.</p>
-              <p className="text-sm text-[#8B7A6B]">Redirigiendo al inicio...</p>
+              <p className="text-[#8B7A6B]">Gracias por ayudar.</p>
             </div>
           </div>
         );
       }
 
       return (
-        <div className="max-w-lg mx-auto px-3 py-4">
-          <h2 className="text-2xl font-display mb-3 text-[#4A3B32] flex items-center gap-2"><span>📋</span> Reportar mascota</h2>
-          <form onSubmit={submit} className="bg-white p-4 rounded-2xl shadow-soft border border-[#E07A5F]/10 space-y-4">
-            <div className="flex gap-2">
-              <button type="button" onClick={()=>handleChange('type','perdido')} className={`flex-1 py-2 rounded-full border-2 text-sm font-medium ${form.type==='perdido'?'border-[#E07A5F] bg-[#E07A5F]/10 text-[#E07A5F]':'border-[#E07A5F]/20 text-[#8B7A6B]'}`}>🐕 Perdí</button>
-              <button type="button" onClick={()=>handleChange('type','avistamiento')} className={`flex-1 py-2 rounded-full border-2 text-sm font-medium ${form.type==='avistamiento'?'border-[#E07A5F] bg-[#E07A5F]/10 text-[#E07A5F]':'border-[#E07A5F]/20 text-[#8B7A6B]'}`}>🐈 Avisté</button>
-            </div>
-            <div className="space-y-3">
-              <input placeholder="Nombre (opcional)" value={form.nombre} onChange={e=>handleChange('nombre',e.target.value)} className="w-full bg-[#FFF9F2] border border-[#E07A5F]/20 rounded-full px-4 py-2 text-sm" />
-              <div className="grid grid-cols-2 gap-2">
-                <select value={form.especie} onChange={e=>handleChange('especie',e.target.value)} className="bg-[#FFF9F2] border border-[#E07A5F]/20 rounded-full px-3 py-2 text-sm"><option>perro</option><option>gato</option></select>
-                <input placeholder="Raza" value={form.raza} onChange={e=>handleChange('raza',e.target.value)} className="bg-[#FFF9F2] border border-[#E07A5F]/20 rounded-full px-3 py-2 text-sm" />
+        <div className="fixed inset-0 z-50 bg-[#FFF9F2] overflow-auto">
+          <div className="sticky top-0 bg-white/90 backdrop-blur-md px-4 py-3 border-b border-[#E07A5F]/20 flex items-center justify-between shadow-soft">
+            <h2 className="text-xl font-display text-[#4A3B32]">📋 Reportar mascota</h2>
+            <button onClick={onClose} className="w-8 h-8 rounded-full bg-[#FEF3E7] flex items-center justify-center text-[#8B7A6B]">&times;</button>
+          </div>
+          <div className="max-w-lg mx-auto px-4 py-6">
+            <form onSubmit={submit} className="bg-white p-5 rounded-2xl shadow-soft border border-[#E07A5F]/10 space-y-4">
+              <div className="flex gap-2">
+                <button type="button" onClick={()=>handleChange('type','perdido')} className={`flex-1 py-2 rounded-full border-2 text-sm font-medium ${form.type==='perdido'?'border-[#E07A5F] bg-[#E07A5F]/10 text-[#E07A5F]':'border-[#E07A5F]/20 text-[#8B7A6B]'}`}>🐕 Perdí</button>
+                <button type="button" onClick={()=>handleChange('type','avistamiento')} className={`flex-1 py-2 rounded-full border-2 text-sm font-medium ${form.type==='avistamiento'?'border-[#E07A5F] bg-[#E07A5F]/10 text-[#E07A5F]':'border-[#E07A5F]/20 text-[#8B7A6B]'}`}>🐈 Avisté</button>
               </div>
-              <div className="grid grid-cols-2 gap-2">
-                <select value={form.color} onChange={e=>handleChange('color',e.target.value)} className="bg-[#FFF9F2] border border-[#E07A5F]/20 rounded-full px-3 py-2 text-sm"><option>Dorado</option><option>Negro</option><option>Blanco</option><option>Café</option><option>Gris</option><option>Manchado</option></select>
-                <select value={form.tamaño} onChange={e=>handleChange('tamaño',e.target.value)} className="bg-[#FFF9F2] border border-[#E07A5F]/20 rounded-full px-3 py-2 text-sm"><option>pequeño</option><option>mediano</option><option>grande</option></select>
+              <div className="space-y-3">
+                <input placeholder="Nombre (opcional)" value={form.nombre} onChange={e=>handleChange('nombre',e.target.value)} className="w-full bg-[#FFF9F2] border border-[#E07A5F]/20 rounded-full px-4 py-2 text-sm" />
+                <div className="grid grid-cols-2 gap-2">
+                  <select value={form.especie} onChange={e=>handleChange('especie',e.target.value)} className="bg-[#FFF9F2] border border-[#E07A5F]/20 rounded-full px-3 py-2 text-sm"><option>perro</option><option>gato</option></select>
+                  <input placeholder="Raza" value={form.raza} onChange={e=>handleChange('raza',e.target.value)} className="bg-[#FFF9F2] border border-[#E07A5F]/20 rounded-full px-3 py-2 text-sm" />
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <select value={form.color} onChange={e=>handleChange('color',e.target.value)} className="bg-[#FFF9F2] border border-[#E07A5F]/20 rounded-full px-3 py-2 text-sm"><option>Dorado</option><option>Negro</option><option>Blanco</option><option>Café</option><option>Gris</option><option>Manchado</option></select>
+                  <select value={form.tamaño} onChange={e=>handleChange('tamaño',e.target.value)} className="bg-[#FFF9F2] border border-[#E07A5F]/20 rounded-full px-3 py-2 text-sm"><option>pequeño</option><option>mediano</option><option>grande</option></select>
+                </div>
+                <select value={form.zona} onChange={e=>handleChange('zona',e.target.value)} className="w-full bg-[#FFF9F2] border border-[#E07A5F]/20 rounded-full px-4 py-2 text-sm">{ZONAS.map(z=><option key={z}>{z}</option>)}</select>
+                <textarea placeholder="Descripción" value={form.descripcion} onChange={e=>handleChange('descripcion',e.target.value)} className="w-full bg-[#FFF9F2] border border-[#E07A5F]/20 rounded-2xl px-4 py-2 text-sm" rows="3"></textarea>
+                <div><label className="block mb-1 text-xs font-medium text-[#8B7A6B]">📸 Foto</label><input type="file" accept="image/*" onChange={handleImage} disabled={processing} className="block w-full text-xs file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:bg-[#E07A5F] file:text-white" />{preview && <img src={preview} className="mt-2 w-24 h-24 object-cover rounded-xl border border-[#E07A5F]/20" />}</div>
+                <div className="grid grid-cols-2 gap-2">
+                  <input placeholder="Tu nombre *" value={form.contactoNombre} onChange={e=>handleChange('contactoNombre',e.target.value)} className="bg-[#FFF9F2] border border-[#E07A5F]/20 rounded-full px-3 py-2 text-sm" required />
+                  <input placeholder="Teléfono (+57) *" value={form.contactoTelefono} onChange={e=>handleChange('contactoTelefono',e.target.value)} className="bg-[#FFF9F2] border border-[#E07A5F]/20 rounded-full px-3 py-2 text-sm" required />
+                </div>
+                <input type="date" value={form.fecha} onChange={e=>handleChange('fecha',e.target.value)} className="w-full bg-[#FFF9F2] border border-[#E07A5F]/20 rounded-full px-4 py-2 text-sm" />
+                {error && <p className="text-[#D9534F] text-xs">{error}</p>}
               </div>
-              <select value={form.zona} onChange={e=>handleChange('zona',e.target.value)} className="w-full bg-[#FFF9F2] border border-[#E07A5F]/20 rounded-full px-4 py-2 text-sm">{ZONAS.map(z=><option key={z}>{z}</option>)}</select>
-              <textarea placeholder="Descripción" value={form.descripcion} onChange={e=>handleChange('descripcion',e.target.value)} className="w-full bg-[#FFF9F2] border border-[#E07A5F]/20 rounded-2xl px-4 py-2 text-sm" rows="2"></textarea>
-              <div><label className="block mb-1 text-xs font-medium text-[#8B7A6B]">📸 Foto</label><input type="file" accept="image/*" onChange={handleImage} disabled={processing} className="block w-full text-xs file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:bg-[#E07A5F] file:text-white" />{preview && <img src={preview} className="mt-2 w-20 h-20 object-cover rounded-xl border border-[#E07A5F]/20" />}</div>
-              <div className="grid grid-cols-2 gap-2">
-                <input placeholder="Tu nombre *" value={form.contactoNombre} onChange={e=>handleChange('contactoNombre',e.target.value)} className="bg-[#FFF9F2] border border-[#E07A5F]/20 rounded-full px-3 py-2 text-sm" required />
-                <input placeholder="Teléfono (+57) *" value={form.contactoTelefono} onChange={e=>handleChange('contactoTelefono',e.target.value)} className="bg-[#FFF9F2] border border-[#E07A5F]/20 rounded-full px-3 py-2 text-sm" required />
-              </div>
-              <input type="date" value={form.fecha} onChange={e=>handleChange('fecha',e.target.value)} className="w-full bg-[#FFF9F2] border border-[#E07A5F]/20 rounded-full px-4 py-2 text-sm" />
-              {error && <p className="text-[#D9534F] text-xs">{error}</p>}
-            </div>
-            <button type="submit" disabled={sending||processing} className="w-full bg-[#E07A5F] hover:bg-[#C86A50] text-white font-display text-base py-3 rounded-full shadow-md transition flex items-center justify-center gap-2">
-              {sending ? 'Enviando...' : '✨ Publicar reporte'}
-            </button>
-          </form>
+              <button type="submit" disabled={sending||processing} className="w-full bg-[#E07A5F] hover:bg-[#C86A50] text-white font-display text-base py-3 rounded-full shadow-md transition">
+                {sending ? 'Enviando...' : '✨ Publicar reporte'}
+              </button>
+            </form>
+          </div>
         </div>
       );
     };
 
     const MatchView = ({ reporte, matches, onClose }) => (
-      <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-3 z-50">
-        <div className="bg-white rounded-2xl w-full max-w-md max-h-[80vh] overflow-auto p-4 shadow-soft border border-[#E07A5F]/20">
+      <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-3 z-50" onClick={onClose}>
+        <div className="bg-white rounded-2xl w-full max-w-md max-h-[80vh] overflow-auto p-4 shadow-soft border border-[#E07A5F]/20" onClick={e => e.stopPropagation()}>
           <div className="flex justify-between items-center mb-3"><h3 className="text-xl font-display text-[#4A3B32]">🎉 ¡Posibles matches!</h3><button onClick={onClose} className="text-2xl text-[#8B7A6B]">&times;</button></div>
           {matches.length===0 ? <p className="text-[#8B7A6B] text-sm">Aún no hay coincidencias.</p> : matches.map((m,i)=>(
             <div key={i} className="bg-[#FFF9F2] p-3 rounded-xl border border-[#E07A5F]/10 mb-3">
@@ -375,14 +360,6 @@
           <button onClick={onClose} className="mt-2 w-full border border-[#E07A5F]/30 py-2 rounded-full text-sm text-[#8B7A6B]">Cerrar</button>
         </div>
       </div>
-    );
-
-    const HowItWorks = () => (
-      <section className="py-10 px-3 bg-[#FEF3E7]/50"><div className="max-w-7xl mx-auto text-center"><h2 className="text-2xl font-display mb-6 text-[#4A3B32]">¿Cómo ayudamos?</h2><div className="grid grid-cols-3 gap-2"><div className="bg-white p-3 rounded-xl shadow-soft"><div className="text-3xl mb-1">📸</div><h3 className="font-display text-sm mb-1">Reporta</h3><p className="text-[10px] text-[#8B7A6B]">Sube foto</p></div><div className="bg-white p-3 rounded-xl shadow-soft"><div className="text-3xl mb-1">🔍</div><h3 className="font-display text-sm mb-1">Match</h3><p className="text-[10px] text-[#8B7A6B]">Coincidencias</p></div><div className="bg-white p-3 rounded-xl shadow-soft"><div className="text-3xl mb-1">🧡</div><h3 className="font-display text-sm mb-1">Reencuentro</h3><p className="text-[10px] text-[#8B7A6B]">WhatsApp</p></div></div></div></section>
-    );
-
-    const Footer = () => (
-      <footer className="border-t border-[#E07A5F]/20 py-5 px-3 bg-white"><div className="max-w-7xl mx-auto text-center text-[#8B7A6B] text-xs"><p>🐾 Tras Sus Huellas · Valle de Aburrá</p><p className="mt-1">Hecho con 🧡 por <a href="https://rakontech.vercel.app" className="text-[#E07A5F] hover:underline">Rakon Tech</a>.</p><p className="mt-1 text-[10px]">© 2026 · Medellín, Colombia</p></div></footer>
     );
 
     const App = () => {
@@ -398,19 +375,22 @@
         })();
       }, []);
 
+      const handleCloseReport = () => setActiveTab('perdidos');
+
       return (
-        <div className="min-h-screen flex flex-col">
-          <Header />
-          <HeroSection stats={stats} />
-          <TabNavigator activeTab={activeTab} setActiveTab={setActiveTab} />
+        <div className="min-h-screen pb-16">
+          <Header stats={stats} />
+          
           <main className="flex-1">
-            {activeTab==='perdidos' && <FeedView type="perdidos" />}
-            {activeTab==='avistamientos' && <FeedView type="avistamientos" />}
-            {activeTab==='reportar' && <ReportForm onMatchFound={setMatchModal} />}
+            {activeTab === 'perdidos' && <FeedView type="perdidos" />}
+            {activeTab === 'avistamientos' && <FeedView type="avistamientos" />}
+            {activeTab === 'reportar' && <ReportForm onMatchFound={setMatchModal} onClose={handleCloseReport} />}
           </main>
-          <HowItWorks />
-          <Footer />
-          {matchModal && <MatchView {...matchModal} onClose={()=>setMatchModal(null)} />}
+
+          <BottomNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
+          <FloatingActionButton setActiveTab={setActiveTab} />
+          
+          {matchModal && <MatchView {...matchModal} onClose={() => setMatchModal(null)} />}
         </div>
       );
     };
