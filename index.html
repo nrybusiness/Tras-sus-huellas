@@ -23,6 +23,8 @@
       --tsh-success: #2D5A27;
       --tsh-warning: #E6A017;
       --tsh-danger: #D9534F;
+      --tsh-urgencia: #B91C1C;
+      --tsh-adopcion: #15803D;
       --tsh-text: #4A3B32;
       --tsh-text-muted: #8B7A6B;
       --tsh-border: rgba(224, 122, 95, 0.15);
@@ -86,7 +88,7 @@
       reader.readAsDataURL(file);
     });
 
-    // ---------- COMPONENTES NUEVOS ----------
+    // ---------- COMPONENTES ----------
     const Header = ({ stats }) => (
       <header className="sticky top-0 z-20 bg-white/90 backdrop-blur-md border-b border-[#E07A5F]/20 px-3 py-2 shadow-soft">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
@@ -144,7 +146,20 @@
         <div className="flex-1 min-w-[110px]">
           <label className="block text-xs font-medium text-[#8B7A6B] mb-1">Especie</label>
           <select className="w-full bg-[#FFF9F2] border border-[#E07A5F]/20 rounded-xl px-2 py-2 text-sm" value={filters.especie} onChange={(e) => setFilters({...filters, especie: e.target.value})}>
-            <option value="todos">Todos</option><option value="perro">🐕 Perros</option><option value="gato">🐈 Gatos</option>
+            <option value="todos">Todos</option>
+            <option value="perro">🐕 Perros</option>
+            <option value="gato">🐈 Gatos</option>
+            <option value="otro">🐾 Otro</option>
+          </select>
+        </div>
+        <div className="flex-1 min-w-[130px]">
+          <label className="block text-xs font-medium text-[#8B7A6B] mb-1">Categoría</label>
+          <select className="w-full bg-[#FFF9F2] border border-[#E07A5F]/20 rounded-xl px-2 py-2 text-sm" value={filters.categoria} onChange={(e) => setFilters({...filters, categoria: e.target.value})}>
+            <option value="todas">Todas</option>
+            <option value="perdido">🔴 Perdidos</option>
+            <option value="avistamiento">🟡 Avistados</option>
+            <option value="urgencia">🚨 Urgencias</option>
+            <option value="adopcion">🏠 Adopción</option>
           </select>
         </div>
         <div className="flex-1 min-w-[130px]">
@@ -154,36 +169,41 @@
             {ZONAS.map(z => <option key={z} value={z}>{z}</option>)}
           </select>
         </div>
-        <div className="w-[100px]">
-          <label className="block text-xs font-medium text-[#8B7A6B] mb-1">Orden</label>
-          <select className="w-full bg-[#FFF9F2] border border-[#E07A5F]/20 rounded-xl px-2 py-2 text-sm" value={filters.sort} onChange={(e) => setFilters({...filters, sort: e.target.value})}>
-            <option value="recientes">Recientes</option><option value="antiguos">Antiguos</option>
-          </select>
-        </div>
       </div>
     );
 
     const PetCard = ({ pet }) => {
-      const text = `Hola, vi el reporte de ${pet.nombre || 'esta mascota'} en Tras Sus Huellas. ¿Podemos ayudarte?`;
+      const categoriaConfig = {
+        perdido: { bg: 'bg-[#D9534F]', text: 'PERDIDO', icon: '🔴' },
+        avistamiento: { bg: 'bg-[#E6A017]', text: 'AVISTADO', icon: '🟡' },
+        urgencia: { bg: 'bg-[#B91C1C]', text: '🚨 URGENTE', icon: '🚨' },
+        adopcion: { bg: 'bg-[#15803D]', text: '🏠 ADOPCIÓN', icon: '🏠' }
+      };
+      const cat = categoriaConfig[pet.categoria] || { bg: 'bg-gray-500', text: pet.categoria?.toUpperCase(), icon: '📌' };
+      const whatsappText = `Hola, vi el reporte de ${pet.nombre || 'esta mascota'} (${cat.text}) en Tras Sus Huellas. ¿Podemos ayudar?`;
+      
       return (
         <div className="bg-white rounded-2xl overflow-hidden border border-[#E07A5F]/10 shadow-soft hover:shadow-md transition-all duration-200">
           <div className="relative aspect-square bg-[#FEF3E7]">
-            {pet.foto ? <img src={pet.foto} alt={pet.nombre} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-6xl">{pet.especie==='perro'?'🐕':'🐈'}</div>}
+            {pet.foto ? <img src={pet.foto} alt={pet.nombre} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-6xl">{pet.especie==='perro'?'🐕':pet.especie==='gato'?'🐈':'🐾'}</div>}
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-3">
               <h3 className="font-display text-white text-lg truncate">{pet.nombre || 'Sin nombre'}</h3>
               <p className="text-white/80 text-xs flex items-center gap-1"><span>📍</span> {pet.zona}</p>
             </div>
-            <span className={`absolute top-2 right-2 px-2 py-0.5 rounded-full text-[10px] font-medium ${pet.estado==='PERDIDO'?'bg-[#D9534F] text-white':'bg-[#E6A017] text-white'}`}>
-              {pet.estado}
+            <span className={`absolute top-2 right-2 px-2 py-0.5 rounded-full text-[10px] font-medium text-white ${cat.bg}`}>
+              {cat.text}
             </span>
           </div>
           <div className="p-3">
-            <div className="flex flex-wrap gap-1 text-xs text-[#8B7A6B] mb-2">
-              <span className="bg-[#FEF3E7] px-2 py-0.5 rounded-full">{pet.raza}</span>
-              <span className="bg-[#FEF3E7] px-2 py-0.5 rounded-full">{pet.color}</span>
-              <span className="text-[10px] ml-auto">{formatDate(pet.fecha)}</span>
+            <div className="flex flex-wrap gap-1 text-xs text-[#8B7A6B] mb-1">
+              <span className="bg-[#FEF3E7] px-2 py-0.5 rounded-full">{pet.raza || 'Raza desconocida'}</span>
+              <span className="bg-[#FEF3E7] px-2 py-0.5 rounded-full">{pet.color || 'Color no especificado'}</span>
             </div>
-            <a href={getWhatsAppLink(pet.contactoTelefono, text)} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-1 w-full bg-[#E07A5F] hover:bg-[#C86A50] text-white text-sm font-medium py-2 rounded-full transition-colors shadow-sm">
+            {pet.descripcion && (
+              <p className="text-xs text-[#8B7A6B] mb-2 italic">"{pet.descripcion.length > 50 ? pet.descripcion.substring(0,50)+'…' : pet.descripcion}"</p>
+            )}
+            <p className="text-[10px] text-[#8B7A6B] mb-2">{formatDate(pet.fecha)}</p>
+            <a href={getWhatsAppLink(pet.contactoTelefono, whatsappText)} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-1 w-full bg-[#E07A5F] hover:bg-[#C86A50] text-white text-sm font-medium py-2 rounded-full transition-colors shadow-sm">
               <span>🧡</span> Contactar
             </a>
           </div>
@@ -193,7 +213,7 @@
 
     const FeedView = ({ type }) => {
       const [pets, setPets] = useState([]);
-      const [filters, setFilters] = useState({ especie: 'todos', zona: 'todas', sort: 'recientes' });
+      const [filters, setFilters] = useState({ especie: 'todos', categoria: 'todas', zona: 'todas' });
       const [loading, setLoading] = useState(true);
       const [error, setError] = useState(false);
 
@@ -223,8 +243,9 @@
       const filtered = useMemo(() => {
         let f = [...pets];
         if (filters.especie !== 'todos') f = f.filter(p => p.especie === filters.especie);
+        if (filters.categoria !== 'todas') f = f.filter(p => p.categoria === filters.categoria);
         if (filters.zona !== 'todas') f = f.filter(p => p.zona === filters.zona);
-        f.sort((a,b) => filters.sort === 'recientes' ? new Date(b.fecha) - new Date(a.fecha) : new Date(a.fecha) - new Date(b.fecha));
+        f.sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
         return f;
       }, [pets, filters]);
 
@@ -249,23 +270,40 @@
     };
 
     const ReportForm = ({ onMatchFound, onClose }) => {
-      const [form, setForm] = useState({ type:'perdido', nombre:'', especie:'perro', raza:'', color:'Dorado', tamaño:'mediano', zona:'Medellín Centro', descripcion:'', foto:'', contactoNombre:'', contactoTelefono:'', fecha: new Date().toISOString().split('T')[0] });
+      const [form, setForm] = useState({
+        categoria: 'perdido',
+        type: 'perdido', // para compatibilidad con backend
+        nombre: '', especie: 'perro', raza: '', color: '', tamaño: 'mediano',
+        zona: 'Medellín Centro', descripcion: '', foto: '',
+        contactoNombre: '', contactoTelefono: '',
+        fecha: new Date().toISOString().split('T')[0]
+      });
       const [preview, setPreview] = useState(null);
       const [sending, setSending] = useState(false);
       const [processing, setProcessing] = useState(false);
       const [error, setError] = useState('');
       const [success, setSuccess] = useState(false);
 
-      const handleChange = (field, value) => setForm(prev => ({...prev, [field]: value}));
+      const handleChange = (field, value) => {
+        setForm(prev => ({...prev, [field]: value}));
+        // Sincronizar type con categoria para compatibilidad con backend antiguo
+        if (field === 'categoria') {
+          const newType = (value === 'perdido' || value === 'urgencia') ? 'perdido' : 'avistamiento';
+          setForm(prev => ({...prev, type: newType}));
+        }
+      };
+      
       const handleImage = async (e) => {
         const file = e.target.files[0]; if (!file) return;
         setProcessing(true);
         try { const b64 = await resizeImage(file); setPreview(b64); handleChange('foto', b64); } catch(e) { alert('Error con imagen'); } finally { setProcessing(false); }
       };
+      
       const validate = () => {
         if (!form.zona || !form.contactoNombre || !form.contactoTelefono) { setError('Zona, nombre y teléfono son obligatorios'); return false; }
         setError(''); return true;
       };
+      
       const submit = async (e) => {
         e.preventDefault(); if (!validate()) return;
         setSending(true);
@@ -278,7 +316,11 @@
             setSuccess(true);
             onMatchFound({ reporte: payload.data, matches: json.matches || [] });
             setTimeout(() => {
-              setForm({ type:'perdido', nombre:'', especie:'perro', raza:'', color:'Dorado', tamaño:'mediano', zona:'Medellín Centro', descripcion:'', foto:'', contactoNombre:'', contactoTelefono:'', fecha: new Date().toISOString().split('T')[0] });
+              setForm({
+                categoria: 'perdido', type: 'perdido', nombre: '', especie: 'perro', raza: '', color: '', tamaño: 'mediano',
+                zona: 'Medellín Centro', descripcion: '', foto: '', contactoNombre: '', contactoTelefono: '',
+                fecha: new Date().toISOString().split('T')[0]
+              });
               setPreview(null);
               setSuccess(false);
               onClose();
@@ -313,22 +355,37 @@
           </div>
           <div className="max-w-lg mx-auto px-4 py-6">
             <form onSubmit={submit} className="bg-white p-5 rounded-2xl shadow-soft border border-[#E07A5F]/10 space-y-4">
-              <div className="flex gap-2">
-                <button type="button" onClick={()=>handleChange('type','perdido')} className={`flex-1 py-2 rounded-full border-2 text-sm font-medium ${form.type==='perdido'?'border-[#E07A5F] bg-[#E07A5F]/10 text-[#E07A5F]':'border-[#E07A5F]/20 text-[#8B7A6B]'}`}>🐕 Perdí</button>
-                <button type="button" onClick={()=>handleChange('type','avistamiento')} className={`flex-1 py-2 rounded-full border-2 text-sm font-medium ${form.type==='avistamiento'?'border-[#E07A5F] bg-[#E07A5F]/10 text-[#E07A5F]':'border-[#E07A5F]/20 text-[#8B7A6B]'}`}>🐈 Avisté</button>
+              <div>
+                <label className="block mb-1 text-xs font-medium text-[#8B7A6B]">Tipo de reporte *</label>
+                <select value={form.categoria} onChange={e=>handleChange('categoria',e.target.value)} className="w-full bg-[#FFF9F2] border border-[#E07A5F]/20 rounded-full px-4 py-2 text-sm" required>
+                  <option value="perdido">🔴 Perdí mi mascota</option>
+                  <option value="avistamiento">🟡 Vi una mascota perdida</option>
+                  <option value="urgencia">🚨 Urgencia (herido, parto, abandono)</option>
+                  <option value="adopcion">🏠 Busca hogar / Adopción</option>
+                </select>
               </div>
               <div className="space-y-3">
-                <input placeholder="Nombre (opcional)" value={form.nombre} onChange={e=>handleChange('nombre',e.target.value)} className="w-full bg-[#FFF9F2] border border-[#E07A5F]/20 rounded-full px-4 py-2 text-sm" />
+                <input placeholder="Nombre de la mascota (opcional)" value={form.nombre} onChange={e=>handleChange('nombre',e.target.value)} className="w-full bg-[#FFF9F2] border border-[#E07A5F]/20 rounded-full px-4 py-2 text-sm" />
                 <div className="grid grid-cols-2 gap-2">
-                  <select value={form.especie} onChange={e=>handleChange('especie',e.target.value)} className="bg-[#FFF9F2] border border-[#E07A5F]/20 rounded-full px-3 py-2 text-sm"><option>perro</option><option>gato</option></select>
-                  <input placeholder="Raza" value={form.raza} onChange={e=>handleChange('raza',e.target.value)} className="bg-[#FFF9F2] border border-[#E07A5F]/20 rounded-full px-3 py-2 text-sm" />
+                  <select value={form.especie} onChange={e=>handleChange('especie',e.target.value)} className="bg-[#FFF9F2] border border-[#E07A5F]/20 rounded-full px-3 py-2 text-sm">
+                    <option value="perro">🐕 Perro</option>
+                    <option value="gato">🐈 Gato</option>
+                    <option value="otro">🐾 Otro</option>
+                  </select>
+                  <input placeholder="Raza (opcional)" value={form.raza} onChange={e=>handleChange('raza',e.target.value)} className="bg-[#FFF9F2] border border-[#E07A5F]/20 rounded-full px-3 py-2 text-sm" />
                 </div>
                 <div className="grid grid-cols-2 gap-2">
-                  <select value={form.color} onChange={e=>handleChange('color',e.target.value)} className="bg-[#FFF9F2] border border-[#E07A5F]/20 rounded-full px-3 py-2 text-sm"><option>Dorado</option><option>Negro</option><option>Blanco</option><option>Café</option><option>Gris</option><option>Manchado</option></select>
-                  <select value={form.tamaño} onChange={e=>handleChange('tamaño',e.target.value)} className="bg-[#FFF9F2] border border-[#E07A5F]/20 rounded-full px-3 py-2 text-sm"><option>pequeño</option><option>mediano</option><option>grande</option></select>
+                  <input placeholder="Color(es) *" value={form.color} onChange={e=>handleChange('color',e.target.value)} className="bg-[#FFF9F2] border border-[#E07A5F]/20 rounded-full px-3 py-2 text-sm" required />
+                  <select value={form.tamaño} onChange={e=>handleChange('tamaño',e.target.value)} className="bg-[#FFF9F2] border border-[#E07A5F]/20 rounded-full px-3 py-2 text-sm">
+                    <option value="pequeño">Pequeño</option>
+                    <option value="mediano">Mediano</option>
+                    <option value="grande">Grande</option>
+                  </select>
                 </div>
-                <select value={form.zona} onChange={e=>handleChange('zona',e.target.value)} className="w-full bg-[#FFF9F2] border border-[#E07A5F]/20 rounded-full px-4 py-2 text-sm">{ZONAS.map(z=><option key={z}>{z}</option>)}</select>
-                <textarea placeholder="Descripción" value={form.descripcion} onChange={e=>handleChange('descripcion',e.target.value)} className="w-full bg-[#FFF9F2] border border-[#E07A5F]/20 rounded-2xl px-4 py-2 text-sm" rows="3"></textarea>
+                <select value={form.zona} onChange={e=>handleChange('zona',e.target.value)} className="w-full bg-[#FFF9F2] border border-[#E07A5F]/20 rounded-full px-4 py-2 text-sm" required>
+                  {ZONAS.map(z=><option key={z} value={z}>{z}</option>)}
+                </select>
+                <textarea placeholder="Descripción detallada" value={form.descripcion} onChange={e=>handleChange('descripcion',e.target.value)} className="w-full bg-[#FFF9F2] border border-[#E07A5F]/20 rounded-2xl px-4 py-2 text-sm" rows="3"></textarea>
                 <div><label className="block mb-1 text-xs font-medium text-[#8B7A6B]">📸 Foto</label><input type="file" accept="image/*" onChange={handleImage} disabled={processing} className="block w-full text-xs file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:bg-[#E07A5F] file:text-white" />{preview && <img src={preview} className="mt-2 w-24 h-24 object-cover rounded-xl border border-[#E07A5F]/20" />}</div>
                 <div className="grid grid-cols-2 gap-2">
                   <input placeholder="Tu nombre *" value={form.contactoNombre} onChange={e=>handleChange('contactoNombre',e.target.value)} className="bg-[#FFF9F2] border border-[#E07A5F]/20 rounded-full px-3 py-2 text-sm" required />
