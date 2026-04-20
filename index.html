@@ -6,6 +6,7 @@
   <meta name="theme-color" content="#FFF9F2">
   <title>Tras Sus Huellas · Valle de Aburrá</title>
   <meta name="description" content="Ayudándolos a volver a casa. Plataforma de búsqueda de mascotas perdidas en Medellín.">
+  <link rel="icon" type="image/png" href="https://i.postimg.cc/0NtVFHpM/20-4-2026-1-32-05-a-m.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Fredoka:wght@400;500;600&display=swap" rel="stylesheet">
@@ -92,8 +93,12 @@
     const Header = ({ stats }) => (
       <header className="sticky top-0 z-20 bg-white/90 backdrop-blur-md border-b border-[#E07A5F]/20 px-3 py-2 shadow-soft">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-1">
-            <span className="text-2xl">🐾</span>
+          <div className="flex items-center gap-2">
+            <img 
+              src="https://i.postimg.cc/25TDRnD3/f92e3e84-56ac-491e-b4c6-88d99d578808.png" 
+              alt="Tras Sus Huellas" 
+              className="w-8 h-8 object-contain"
+            />
             <h1 className="text-lg font-display tracking-tight text-[#4A3B32]">
               Tras Sus <span className="text-[#E07A5F]">Huellas</span>
             </h1>
@@ -183,7 +188,6 @@
       const whatsappText = `Hola, vi el reporte de ${pet.nombre || 'esta mascota'} (${cat.text}) en Tras Sus Huellas. ¿Podemos ayudar?`;
       
       const handleCardClick = (e) => {
-        // Evitar que se abra el detalle si se hizo clic en el botón de contacto
         if (e.target.closest('a')) return;
         onOpenDetail(pet);
       };
@@ -378,7 +382,7 @@
         type: 'perdido',
         nombre: '', especie: 'perro', raza: '', color: '', tamaño: 'mediano',
         zona: 'Medellín Centro', descripcion: '', foto: '',
-        contactoNombre: '', contactoTelefonoLocal: '', // NUEVO: solo la parte local
+        contactoNombre: '', contactoTelefonoLocal: '',
         fecha: new Date().toISOString().split('T')[0]
       });
       const [preview, setPreview] = useState(null);
@@ -415,7 +419,6 @@
         if (!validate()) return;
         setSending(true);
         setError('');
-        // Construir teléfono completo con +57
         const telefonoCompleto = '+57' + form.contactoTelefonoLocal.replace(/\D/g, '');
         const payload = { 
           action: 'reportar', 
@@ -423,7 +426,7 @@
           data: { 
             ...form, 
             contactoTelefono: telefonoCompleto,
-            contactoTelefonoLocal: undefined // No enviar el campo local
+            contactoTelefonoLocal: undefined
           } 
         };
         try {
