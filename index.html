@@ -272,7 +272,7 @@
     const ReportForm = ({ onMatchFound, onClose }) => {
       const [form, setForm] = useState({
         categoria: 'perdido',
-        type: 'perdido', // para compatibilidad con backend
+        type: 'perdido',
         nombre: '', especie: 'perro', raza: '', color: '', tamaño: 'mediano',
         zona: 'Medellín Centro', descripcion: '', foto: '',
         contactoNombre: '', contactoTelefono: '',
@@ -286,7 +286,6 @@
 
       const handleChange = (field, value) => {
         setForm(prev => ({...prev, [field]: value}));
-        // Sincronizar type con categoria para compatibilidad con backend antiguo
         if (field === 'categoria') {
           const newType = (value === 'perdido' || value === 'urgencia') ? 'perdido' : 'avistamiento';
           setForm(prev => ({...prev, type: newType}));
