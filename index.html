@@ -6,10 +6,8 @@
   <meta name="theme-color" content="#FFF9F2">
   <title>Tras Sus Huellas · Valle de Aburrá</title>
   <meta name="description" content="Ayudándolos a volver a casa. Plataforma de búsqueda de mascotas perdidas en Medellín.">
-  <link rel="icon" type="image/png" href="https://i.postimg.cc/vBzFDdx1/20-4-2026-1-32-05-a-m.png">
-  <!-- Leaflet CSS -->
+  <link rel="icon" type="image/png" href="https://i.postimg.cc/25TDRnD3/f92e3e84-56ac-491e-b4c6-88d99d578808.png">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <!-- Fuentes -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Fredoka:wght@400;500;600&display=swap" rel="stylesheet">
@@ -17,7 +15,6 @@
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
     :root {
@@ -36,7 +33,6 @@
       --tsh-border: rgba(224, 122, 95, 0.15);
       --shadow-sm: 0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02);
       --shadow-md: 0 6px 16px rgba(0,0,0,0.06);
-      --shadow-lg: 0 10px 25px -5px rgba(0,0,0,0.1);
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -46,11 +42,7 @@
       font-family: 'Quicksand', sans-serif;
       -webkit-font-smoothing: antialiased;
     }
-    h1, h2, h3, .font-display {
-      font-family: 'Fredoka', sans-serif;
-      font-weight: 600;
-      letter-spacing: -0.01em;
-    }
+    h1, h2, h3, .font-display { font-family: 'Fredoka', sans-serif; font-weight: 600; }
     ::-webkit-scrollbar { width: 4px; }
     ::-webkit-scrollbar-track { background: var(--tsh-surface-2); }
     ::-webkit-scrollbar-thumb { background: var(--tsh-accent); border-radius: 8px; }
@@ -66,7 +58,7 @@
     const GAS_URL = 'https://script.google.com/macros/s/AKfycbwIjj7RQWHhYUTxPYzDoVaghh8LLngV5EFWVX_WZyIyRS44LBNm3z33niQhPbQPjYPE/exec';
 
     const ZONAS = ['Medellín Centro','El Poblado','Laureles-Estadio','Belén','Robledo','Envigado','Itagüí','Sabaneta','Bello','Copacabana','La Estrella','Caldas','Barbosa','Girardota'];
-    const CENTRO_VALLE = [6.2442, -75.5812]; // Medellín
+    const CENTRO_VALLE = [6.2442, -75.5812];
 
     const formatDate = (dateStr) => {
       const diff = new Date() - new Date(dateStr);
@@ -101,14 +93,8 @@
       <header className="sticky top-0 z-20 bg-white/90 backdrop-blur-md border-b border-[#E07A5F]/20 px-3 py-2 shadow-soft">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <img 
-              src="https://i.postimg.cc/vBzFDdx1/20-4-2026-1-32-05-a-m.png" 
-              alt="Tras Sus Huellas" 
-              className="w-8 h-8 object-contain"
-            />
-            <h1 className="text-lg font-display tracking-tight text-[#4A3B32]">
-              Tras Sus <span className="text-[#E07A5F]">Huellas</span>
-            </h1>
+            <img src="https://i.postimg.cc/25TDRnD3/f92e3e84-56ac-491e-b4c6-88d99d578808.png" alt="Logo" className="w-8 h-8 object-contain" />
+            <h1 className="text-lg font-display tracking-tight text-[#4A3B32]">Tras Sus <span className="text-[#E07A5F]">Huellas</span></h1>
           </div>
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-3 text-xs">
@@ -116,9 +102,7 @@
               <div className="text-center"><span className="font-display text-[#E6A017]">{stats.totalAvistamientos}</span><span className="ml-1 text-[#8B7A6B]">🟡</span></div>
               <div className="text-center"><span className="font-display text-[#2D5A27]">{stats.resueltos}</span><span className="ml-1 text-[#8B7A6B]">✅</span></div>
             </div>
-            <span className="bg-[#FEF3E7] px-2 py-0.5 rounded-full text-[10px] font-medium text-[#8B7A6B] border border-[#E07A5F]/30">
-              Valle de Aburrá
-            </span>
+            <span className="bg-[#FEF3E7] px-2 py-0.5 rounded-full text-[10px] font-medium text-[#8B7A6B] border border-[#E07A5F]/30">Valle de Aburrá</span>
           </div>
         </div>
       </header>
@@ -130,31 +114,18 @@
         { id: 'avistamientos', label: 'Avistados', icon: '🟡' }
       ];
       return (
-        <div className="fixed bottom-0 left-0 right-0 z-30 bg-white/90 backdrop-blur-md border-t border-[#E07A5F]/20 px-4 py-2 safe-area-inset-bottom">
+        <div className="fixed bottom-0 left-0 right-0 z-30 bg-white/90 backdrop-blur-md border-t border-[#E07A5F]/20 px-4 py-2">
           <div className="max-w-7xl mx-auto flex justify-around items-center">
-            <button 
-              onClick={() => setViewMode('feed')} 
-              className={`flex flex-col items-center py-1 px-4 rounded-full transition ${viewMode === 'feed' ? 'text-[#E07A5F]' : 'text-[#8B7A6B]'}`}
-            >
-              <span className="text-xl">📋</span>
-              <span className="text-[10px] font-medium">Lista</span>
+            <button onClick={() => setViewMode('feed')} className={`flex flex-col items-center py-1 px-4 rounded-full transition ${viewMode === 'feed' ? 'text-[#E07A5F]' : 'text-[#8B7A6B]'}`}>
+              <span className="text-xl">📋</span><span className="text-[10px] font-medium">Lista</span>
             </button>
             {tabs.map(tab => (
-              <button 
-                key={tab.id} 
-                onClick={() => { setActiveTab(tab.id); setViewMode('feed'); }} 
-                className={`flex flex-col items-center py-1 px-4 rounded-full transition ${activeTab === tab.id && viewMode === 'feed' ? 'text-[#E07A5F]' : 'text-[#8B7A6B]'}`}
-              >
-                <span className="text-xl">{tab.icon}</span>
-                <span className="text-[10px] font-medium">{tab.label}</span>
+              <button key={tab.id} onClick={() => { setActiveTab(tab.id); setViewMode('feed'); }} className={`flex flex-col items-center py-1 px-4 rounded-full transition ${activeTab === tab.id && viewMode === 'feed' ? 'text-[#E07A5F]' : 'text-[#8B7A6B]'}`}>
+                <span className="text-xl">{tab.icon}</span><span className="text-[10px] font-medium">{tab.label}</span>
               </button>
             ))}
-            <button 
-              onClick={() => setViewMode('map')} 
-              className={`flex flex-col items-center py-1 px-4 rounded-full transition ${viewMode === 'map' ? 'text-[#E07A5F]' : 'text-[#8B7A6B]'}`}
-            >
-              <span className="text-xl">🗺️</span>
-              <span className="text-[10px] font-medium">Mapa</span>
+            <button onClick={() => setViewMode('map')} className={`flex flex-col items-center py-1 px-4 rounded-full transition ${viewMode === 'map' ? 'text-[#E07A5F]' : 'text-[#8B7A6B]'}`}>
+              <span className="text-xl">🗺️</span><span className="text-[10px] font-medium">Mapa</span>
             </button>
           </div>
         </div>
@@ -162,11 +133,7 @@
     };
 
     const FloatingActionButton = ({ setActiveTab }) => (
-      <button
-        onClick={() => setActiveTab('reportar')}
-        className="fixed bottom-20 right-5 z-40 w-14 h-14 rounded-full bg-[#E07A5F] text-white shadow-lg flex items-center justify-center text-2xl hover:bg-[#C86A50] transition-all active:scale-95"
-        style={{ boxShadow: '0 8px 20px rgba(224,122,95,0.4)' }}
-      >
+      <button onClick={() => setActiveTab('reportar')} className="fixed bottom-20 right-5 z-40 w-14 h-14 rounded-full bg-[#E07A5F] text-white shadow-lg flex items-center justify-center text-2xl hover:bg-[#C86A50] transition-all active:scale-95" style={{ boxShadow: '0 8px 20px rgba(224,122,95,0.4)' }}>
         <span>📋</span>
       </button>
     );
@@ -176,27 +143,19 @@
         <div className="flex-1 min-w-[110px]">
           <label className="block text-xs font-medium text-[#8B7A6B] mb-1">Especie</label>
           <select className="w-full bg-[#FFF9F2] border border-[#E07A5F]/20 rounded-xl px-2 py-2 text-sm" value={filters.especie} onChange={(e) => setFilters({...filters, especie: e.target.value})}>
-            <option value="todos">Todos</option>
-            <option value="perro">🐕 Perros</option>
-            <option value="gato">🐈 Gatos</option>
-            <option value="otro">🐾 Otro</option>
+            <option value="todos">Todos</option><option value="perro">🐕 Perros</option><option value="gato">🐈 Gatos</option><option value="otro">🐾 Otro</option>
           </select>
         </div>
         <div className="flex-1 min-w-[130px]">
           <label className="block text-xs font-medium text-[#8B7A6B] mb-1">Categoría</label>
           <select className="w-full bg-[#FFF9F2] border border-[#E07A5F]/20 rounded-xl px-2 py-2 text-sm" value={filters.categoria} onChange={(e) => setFilters({...filters, categoria: e.target.value})}>
-            <option value="todas">Todas</option>
-            <option value="perdido">🔴 Perdidos</option>
-            <option value="avistamiento">🟡 Avistados</option>
-            <option value="urgencia">🚨 Urgencias</option>
-            <option value="adopcion">🏠 Adopción</option>
+            <option value="todas">Todas</option><option value="perdido">🔴 Perdidos</option><option value="avistamiento">🟡 Avistados</option><option value="urgencia">🚨 Urgencias</option><option value="adopcion">🏠 Adopción</option>
           </select>
         </div>
         <div className="flex-1 min-w-[130px]">
           <label className="block text-xs font-medium text-[#8B7A6B] mb-1">Zona</label>
           <select className="w-full bg-[#FFF9F2] border border-[#E07A5F]/20 rounded-xl px-2 py-2 text-sm" value={filters.zona} onChange={(e) => setFilters({...filters, zona: e.target.value})}>
-            <option value="todas">Todas</option>
-            {ZONAS.map(z => <option key={z} value={z}>{z}</option>)}
+            <option value="todas">Todas</option>{ZONAS.map(z => <option key={z} value={z}>{z}</option>)}
           </select>
         </div>
       </div>
@@ -212,41 +171,26 @@
       const cat = categoriaConfig[pet.categoria] || { bg: 'bg-gray-500', text: pet.categoria?.toUpperCase() };
       const whatsappText = `Hola, vi el reporte de ${pet.nombre || 'esta mascota'} (${cat.text}) en Tras Sus Huellas. ¿Podemos ayudar?`;
       
-      const handleCardClick = (e) => {
-        if (e.target.closest('a')) return;
-        onOpenDetail(pet);
-      };
-
       return (
-        <div 
-          className="bg-white rounded-2xl overflow-hidden border border-[#E07A5F]/10 shadow-soft hover:shadow-md transition-all duration-200 cursor-pointer"
-          onClick={handleCardClick}
-        >
+        <div className="bg-white rounded-2xl overflow-hidden border border-[#E07A5F]/10 shadow-soft hover:shadow-md transition-all duration-200 cursor-pointer" onClick={(e) => { if (!e.target.closest('a')) onOpenDetail(pet); }}>
           <div className="relative aspect-square bg-[#FEF3E7]">
             {pet.foto ? <img src={pet.foto} alt={pet.nombre} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-6xl">{pet.especie==='perro'?'🐕':pet.especie==='gato'?'🐈':'🐾'}</div>}
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-3">
               <h3 className="font-display text-white text-lg truncate">{pet.nombre || 'Sin nombre'}</h3>
               <p className="text-white/80 text-xs flex items-center gap-1"><span>📍</span> {pet.zona}</p>
             </div>
-            <span className={`absolute top-2 right-2 px-2 py-0.5 rounded-full text-[10px] font-medium text-white ${cat.bg}`}>
-              {cat.text}
-            </span>
+            <span className={`absolute top-2 right-2 px-2 py-0.5 rounded-full text-[10px] font-medium text-white ${cat.bg}`}>{cat.text}</span>
           </div>
           <div className="p-3">
             <div className="flex flex-wrap gap-1 text-xs text-[#8B7A6B] mb-1">
               <span className="bg-[#FEF3E7] px-2 py-0.5 rounded-full">{pet.raza || 'Raza desconocida'}</span>
               <span className="bg-[#FEF3E7] px-2 py-0.5 rounded-full">{pet.color || 'Color no especificado'}</span>
+              {pet.sexo && <span className="bg-[#FEF3E7] px-2 py-0.5 rounded-full">{pet.sexo==='macho'?'♂️':'♀️'}</span>}
+              {pet.edad && <span className="bg-[#FEF3E7] px-2 py-0.5 rounded-full">{pet.edad}</span>}
             </div>
-            {pet.descripcion && (
-              <p className="text-xs text-[#8B7A6B] mb-2 italic">"{pet.descripcion.length > 50 ? pet.descripcion.substring(0,50)+'…' : pet.descripcion}"</p>
-            )}
+            {pet.descripcion && <p className="text-xs text-[#8B7A6B] mb-2 italic">"{pet.descripcion.length > 50 ? pet.descripcion.substring(0,50)+'…' : pet.descripcion}"</p>}
             <p className="text-[10px] text-[#8B7A6B] mb-2">{formatDate(pet.fecha)}</p>
-            <a 
-              href={getWhatsAppLink(pet.contactoTelefono, whatsappText)} 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="flex items-center justify-center gap-1 w-full bg-[#E07A5F] hover:bg-[#C86A50] text-white text-sm font-medium py-2 rounded-full transition-colors shadow-sm"
-            >
+            <a href={getWhatsAppLink(pet.contactoTelefono, whatsappText)} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-1 w-full bg-[#E07A5F] hover:bg-[#C86A50] text-white text-sm font-medium py-2 rounded-full transition-colors shadow-sm">
               <span>🧡</span> Contactar
             </a>
           </div>
@@ -269,22 +213,9 @@
           <div className="min-h-screen flex items-center justify-center p-4" onClick={e => e.stopPropagation()}>
             <div className="bg-white rounded-3xl shadow-lg max-w-lg w-full overflow-hidden border border-[#E07A5F]/20">
               <div className="relative aspect-video bg-[#FEF3E7]">
-                {pet.foto ? (
-                  <img src={pet.foto} alt={pet.nombre} className="w-full h-full object-contain" />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-8xl">
-                    {pet.especie==='perro'?'🐕':pet.especie==='gato'?'🐈':'🐾'}
-                  </div>
-                )}
-                <button 
-                  onClick={onClose}
-                  className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center text-[#4A3B32] shadow-md"
-                >
-                  &times;
-                </button>
-                <span className={`absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-medium text-white ${cat.bg}`}>
-                  {cat.text}
-                </span>
+                {pet.foto ? <img src={pet.foto} alt={pet.nombre} className="w-full h-full object-contain" /> : <div className="w-full h-full flex items-center justify-center text-8xl">{pet.especie==='perro'?'🐕':pet.especie==='gato'?'🐈':'🐾'}</div>}
+                <button onClick={onClose} className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center text-[#4A3B32] shadow-md">&times;</button>
+                <span className={`absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-medium text-white ${cat.bg}`}>{cat.text}</span>
               </div>
               <div className="p-5">
                 <div className="flex justify-between items-start mb-3">
@@ -295,6 +226,8 @@
                   <div className="flex items-center gap-2">
                     <span className="text-lg">{pet.especie==='perro'?'🐕':pet.especie==='gato'?'🐈':'🐾'}</span>
                     <span className="font-medium">{pet.raza || 'Raza no especificada'}</span>
+                    {pet.sexo && <span className="text-sm bg-[#FEF3E7] px-2 py-1 rounded-full">{pet.sexo==='macho'?'♂️ Macho':'♀️ Hembra'}</span>}
+                    {pet.edad && <span className="text-sm bg-[#FEF3E7] px-2 py-1 rounded-full">{pet.edad}</span>}
                   </div>
                   <div className="grid grid-cols-2 gap-2 text-sm">
                     <div className="bg-[#FEF3E7] p-2 rounded-xl"><span className="text-[#8B7A6B]">Color:</span> {pet.color || '—'}</div>
@@ -314,7 +247,6 @@
       );
     };
 
-    // Componente de Mapa con Leaflet
     const MapView = ({ pets, onOpenDetail }) => {
       const mapRef = useRef(null);
       const mapInstance = useRef(null);
@@ -324,66 +256,28 @@
         if (!mapRef.current) return;
         if (!mapInstance.current) {
           mapInstance.current = L.map(mapRef.current).setView(CENTRO_VALLE, 12);
-          L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          }).addTo(mapInstance.current);
+          L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; OpenStreetMap' }).addTo(mapInstance.current);
           markersLayer.current = L.layerGroup().addTo(mapInstance.current);
         }
-
-        const markers = [];
         markersLayer.current.clearLayers();
-
         pets.forEach(pet => {
           if (pet.lat && pet.lng) {
-            const categoriaConfig = {
-              perdido: { color: '#D9534F' },
-              avistamiento: { color: '#E6A017' },
-              urgencia: { color: '#B91C1C' },
-              adopcion: { color: '#15803D' }
-            };
-            const color = categoriaConfig[pet.categoria]?.color || '#888';
-            
-            const marker = L.circleMarker([pet.lat, pet.lng], {
-              radius: 8,
-              fillColor: color,
-              color: '#fff',
-              weight: 2,
-              opacity: 1,
-              fillOpacity: 0.8
-            });
-
+            const color = { perdido: '#D9534F', avistamiento: '#E6A017', urgencia: '#B91C1C', adopcion: '#15803D' }[pet.categoria] || '#888';
+            const marker = L.circleMarker([pet.lat, pet.lng], { radius: 8, fillColor: color, color: '#fff', weight: 2, fillOpacity: 0.8 });
             const popupContent = `
-              <div style="min-width:200px; font-family: 'Quicksand', sans-serif;">
+              <div style="min-width:200px; font-family:'Quicksand',sans-serif;">
                 <div style="display:flex; gap:10px; margin-bottom:8px;">
-                  ${pet.foto ? `<img src="${pet.foto}" style="width:50px; height:50px; object-fit:cover; border-radius:12px;" />` : `<div style="width:50px; height:50px; background:#FEF3E7; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:24px;">${pet.especie==='perro'?'🐕':'🐈'}</div>`}
-                  <div>
-                    <strong style="font-size:16px;">${pet.nombre || 'Sin nombre'}</strong>
-                    <div style="font-size:12px; color:#8B7A6B;">${pet.raza || ''}</div>
-                    <div style="font-size:12px; color:#8B7A6B;">📍 ${pet.zona}</div>
-                  </div>
+                  ${pet.foto ? `<img src="${pet.foto}" style="width:50px;height:50px;object-fit:cover;border-radius:12px;" />` : `<div style="width:50px;height:50px;background:#FEF3E7;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;">${pet.especie==='perro'?'🐕':'🐈'}</div>`}
+                  <div><strong style="font-size:16px;">${pet.nombre||'Sin nombre'}</strong><div style="font-size:12px;color:#8B7A6B;">${pet.raza||''}</div><div style="font-size:12px;color:#8B7A6B;">📍 ${pet.zona}</div></div>
                 </div>
-                <button id="popup-detail-${pet.id}" style="width:100%; background:#E07A5F; border:none; color:white; padding:8px; border-radius:40px; font-weight:600; margin-bottom:4px;">Ver detalles</button>
-                <a href="${getWhatsAppLink(pet.contactoTelefono, `Hola, vi a ${pet.nombre || 'esta mascota'} en el mapa de Tras Sus Huellas.`)}" target="_blank" style="display:block; text-align:center; background:#2D5A27; color:white; padding:8px; border-radius:40px; text-decoration:none; font-weight:500;">🧡 Contactar</a>
-              </div>
-            `;
-
+                <button id="popup-detail-${pet.id}" style="width:100%;background:#E07A5F;border:none;color:white;padding:8px;border-radius:40px;font-weight:600;margin-bottom:4px;">Ver detalles</button>
+                <a href="${getWhatsAppLink(pet.contactoTelefono, `Hola, vi a ${pet.nombre||'esta mascota'} en el mapa.`)}" target="_blank" style="display:block;text-align:center;background:#2D5A27;color:white;padding:8px;border-radius:40px;text-decoration:none;font-weight:500;">🧡 Contactar</a>
+              </div>`;
             marker.bindPopup(popupContent);
-            marker.on('popupopen', () => {
-              const btn = document.getElementById(`popup-detail-${pet.id}`);
-              if (btn) btn.addEventListener('click', () => onOpenDetail(pet));
-            });
-            markers.push(marker);
+            marker.on('popupopen', () => { const btn = document.getElementById(`popup-detail-${pet.id}`); if (btn) btn.addEventListener('click', () => onOpenDetail(pet)); });
+            markersLayer.current.addLayer(marker);
           }
         });
-
-        markers.forEach(m => markersLayer.current.addLayer(m));
-
-        return () => {
-          if (mapInstance.current) {
-            mapInstance.current.remove();
-            mapInstance.current = null;
-          }
-        };
       }, [pets, onOpenDetail]);
 
       return <div ref={mapRef} style={{ height: 'calc(100vh - 120px)', width: '100%', zIndex: 1 }} />;
@@ -395,28 +289,19 @@
       const [loading, setLoading] = useState(true);
       const [error, setError] = useState(false);
 
-      const loadData = useCallback(async () => {
-        setLoading(true);
-        setError(false);
-        if (GAS_URL) {
-          try {
-            const res = await fetch(`${GAS_URL}?action=feed&type=${type}`);
-            const json = await res.json();
-            if (json.ok) {
-              setPets(json.data);
-            } else {
-              setError(true);
-            }
-          } catch(e) {
-            setError(true);
+      useEffect(() => {
+        (async () => {
+          setLoading(true);
+          if (GAS_URL) {
+            try {
+              const res = await fetch(`${GAS_URL}?action=feed&type=${type}`);
+              const json = await res.json();
+              if (json.ok) setPets(json.data); else setError(true);
+            } catch(e) { setError(true); }
           }
-        } else {
-          setError(true);
-        }
-        setLoading(false);
+          setLoading(false);
+        })();
       }, [type]);
-
-      useEffect(() => { loadData(); }, [loadData]);
 
       const filtered = useMemo(() => {
         let f = [...pets];
@@ -429,79 +314,37 @@
 
       if (loading) return <div className="text-center py-12 text-[#8B7A6B]">🐾 Cargando reportes...</div>;
       if (error) return <div className="text-center py-12 text-[#8B7A6B]">⚠️ No pudimos cargar los datos.</div>;
-
-      if (viewMode === 'map') {
-        return <MapView pets={filtered} onOpenDetail={onOpenDetail} />;
-      }
+      if (viewMode === 'map') return <MapView pets={filtered} onOpenDetail={onOpenDetail} />;
 
       return (
         <div className="max-w-7xl mx-auto px-3 pt-2 pb-24">
           <FilterBar filters={filters} setFilters={setFilters} />
-          {filtered.length === 0 ? (
-            <div className="text-center py-10 bg-white rounded-2xl shadow-soft p-6">
-              <span className="text-4xl mb-3 block">🐾</span>
-              <p className="text-[#8B7A6B]">Aún no hay reportes.</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {filtered.map(pet => <PetCard key={pet.id} pet={pet} onOpenDetail={onOpenDetail} />)}
-            </div>
-          )}
+          {filtered.length === 0 ? <div className="text-center py-10 bg-white rounded-2xl shadow-soft p-6"><span className="text-4xl mb-3 block">🐾</span><p className="text-[#8B7A6B]">Aún no hay reportes.</p></div> :
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">{filtered.map(pet => <PetCard key={pet.id} pet={pet} onOpenDetail={onOpenDetail} />)}</div>}
         </div>
       );
     };
 
-    // Selector de ubicación en el formulario
     const LocationPicker = ({ onSelect, initialLat, initialLng }) => {
       const mapRef = useRef(null);
-      const markerRef = useRef(null);
       const [selected, setSelected] = useState({ lat: initialLat || CENTRO_VALLE[0], lng: initialLng || CENTRO_VALLE[1] });
 
       useEffect(() => {
         if (!mapRef.current) return;
         const map = L.map(mapRef.current).setView([selected.lat, selected.lng], 14);
         L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(map);
-        
         const marker = L.marker([selected.lat, selected.lng], { draggable: true }).addTo(map);
-        marker.on('dragend', (e) => {
-          const pos = e.target.getLatLng();
-          setSelected({ lat: pos.lat, lng: pos.lng });
-          onSelect(pos.lat, pos.lng);
-        });
-        markerRef.current = marker;
-
-        map.on('click', (e) => {
-          const { lat, lng } = e.latlng;
-          setSelected({ lat, lng });
-          marker.setLatLng([lat, lng]);
-          onSelect(lat, lng);
-        });
-
-        // Botón GPS
+        marker.on('dragend', (e) => { const pos = e.target.getLatLng(); setSelected(pos); onSelect(pos.lat, pos.lng); });
+        map.on('click', (e) => { const { lat, lng } = e.latlng; setSelected({ lat, lng }); marker.setLatLng([lat, lng]); onSelect(lat, lng); });
         const GPSControl = L.Control.extend({
-          onAdd: function() {
+          onAdd: () => {
             const btn = L.DomUtil.create('button', 'bg-white border border-[#E07A5F]/30 rounded-full p-2 shadow-md');
-            btn.innerHTML = '📍';
-            btn.title = 'Usar mi ubicación';
-            btn.onclick = (e) => {
-              e.preventDefault();
-              if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition((pos) => {
-                  const lat = pos.coords.latitude;
-                  const lng = pos.coords.longitude;
-                  map.setView([lat, lng], 16);
-                  marker.setLatLng([lat, lng]);
-                  setSelected({ lat, lng });
-                  onSelect(lat, lng);
-                });
-              }
-              return false;
-            };
+            btn.innerHTML = '📍'; btn.title = 'Usar mi ubicación';
+            btn.onclick = (e) => { e.preventDefault(); navigator.geolocation?.getCurrentPosition(p => { map.setView([p.coords.latitude, p.coords.longitude], 16); marker.setLatLng([p.coords.latitude, p.coords.longitude]); setSelected({ lat: p.coords.latitude, lng: p.coords.longitude }); onSelect(p.coords.latitude, p.coords.longitude); }); return false; };
             return btn;
           }
         });
         map.addControl(new GPSControl({ position: 'topright' }));
-
         return () => map.remove();
       }, []);
 
@@ -512,6 +355,7 @@
       const [form, setForm] = useState({
         categoria: 'perdido', type: 'perdido',
         nombre: '', especie: 'perro', raza: '', color: '', tamaño: 'mediano',
+        sexo: '', edad: '',
         zona: 'Medellín Centro', descripcion: '', foto: '',
         contactoNombre: '', contactoTelefonoLocal: '',
         fecha: new Date().toISOString().split('T')[0],
@@ -537,21 +381,12 @@
         try { const b64 = await resizeImage(file); setPreview(b64); handleChange('foto', b64); } catch(e) { alert('Error con imagen'); } finally { setProcessing(false); }
       };
       
-      const validate = () => {
-        if (!form.zona || !form.contactoNombre || !form.contactoTelefonoLocal) { 
-          setError('Zona, nombre y teléfono son obligatorios'); return false; 
-        }
-        setError(''); return true;
-      };
-      
       const submit = async (e) => {
-        e.preventDefault(); if (!validate()) return;
+        e.preventDefault();
+        if (!form.zona || !form.contactoNombre || !form.contactoTelefonoLocal) { setError('Zona, nombre y teléfono son obligatorios'); return; }
         setSending(true); setError('');
         const telefonoCompleto = '+57' + form.contactoTelefonoLocal.replace(/\D/g, '');
-        const payload = { 
-          action: 'reportar', type: form.type, 
-          data: { ...form, contactoTelefono: telefonoCompleto, contactoTelefonoLocal: undefined }
-        };
+        const payload = { action: 'reportar', type: form.type, data: { ...form, contactoTelefono: telefonoCompleto, contactoTelefonoLocal: undefined } };
         try {
           const res = await fetch(GAS_URL, { method: 'POST', headers: {'Content-Type':'text/plain'}, body: JSON.stringify(payload) });
           const json = await res.json();
@@ -559,11 +394,7 @@
             setSuccess(true);
             onMatchFound({ reporte: payload.data, matches: json.matches || [] });
             setTimeout(() => {
-              setForm({
-                categoria: 'perdido', type: 'perdido', nombre: '', especie: 'perro', raza: '', color: '', tamaño: 'mediano',
-                zona: 'Medellín Centro', descripcion: '', foto: '', contactoNombre: '', contactoTelefonoLocal: '',
-                fecha: new Date().toISOString().split('T')[0], lat: CENTRO_VALLE[0], lng: CENTRO_VALLE[1]
-              });
+              setForm({ categoria: 'perdido', type: 'perdido', nombre: '', especie: 'perro', raza: '', color: '', tamaño: 'mediano', sexo: '', edad: '', zona: 'Medellín Centro', descripcion: '', foto: '', contactoNombre: '', contactoTelefonoLocal: '', fecha: new Date().toISOString().split('T')[0], lat: CENTRO_VALLE[0], lng: CENTRO_VALLE[1] });
               setPreview(null); setSuccess(false); onClose();
             }, 2000);
           } else setError(json.error || 'Error en el servidor');
@@ -571,13 +402,7 @@
         finally { setSending(false); }
       };
 
-      if (success) {
-        return (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/95 p-4">
-            <div className="text-center"><span className="text-7xl mb-4 block">✅</span><h3 className="text-2xl font-display text-[#4A3B32] mb-2">¡Reporte enviado!</h3><p className="text-[#8B7A6B]">Gracias por ayudar.</p></div>
-          </div>
-        );
-      }
+      if (success) return <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/95 p-4"><div className="text-center"><span className="text-7xl mb-4 block">✅</span><h3 className="text-2xl font-display text-[#4A3B32] mb-2">¡Reporte enviado!</h3><p className="text-[#8B7A6B]">Gracias por ayudar.</p></div></div>;
 
       return (
         <div className="fixed inset-0 z-50 bg-[#FFF9F2] overflow-auto">
@@ -586,7 +411,8 @@
             <button onClick={onClose} className="w-8 h-8 rounded-full bg-[#FEF3E7] flex items-center justify-center text-[#8B7A6B]">&times;</button>
           </div>
           <div className="max-w-lg mx-auto px-4 py-6">
-            <form onSubmit={submit} className="bg-white p-5 rounded-2xl shadow-soft border border-[#E07A5F]/10 space-y-4">
+            <form onSubmit={submit} className="bg-white p-5 rounded-2xl shadow-soft border border-[#E07A5F]/10 space-y-5">
+              {/* Tipo de reporte */}
               <div>
                 <label className="block mb-1 text-xs font-medium text-[#8B7A6B]">Tipo de reporte *</label>
                 <select value={form.categoria} onChange={e=>handleChange('categoria',e.target.value)} className="w-full bg-[#FFF9F2] border border-[#E07A5F]/20 rounded-full px-4 py-2 text-sm" required>
@@ -596,13 +422,16 @@
                   <option value="adopcion">🏠 Busca hogar / Adopción</option>
                 </select>
               </div>
-              <div className="space-y-3">
-                <input placeholder="Nombre de la mascota (opcional)" value={form.nombre} onChange={e=>handleChange('nombre',e.target.value)} className="w-full bg-[#FFF9F2] border border-[#E07A5F]/20 rounded-full px-4 py-2 text-sm" />
+
+              {/* Datos de la mascota */}
+              <div className="space-y-3 pt-2 border-t border-[#E07A5F]/10">
+                <p className="text-sm font-medium text-[#4A3B32]">🐾 Datos de la mascota</p>
+                <input placeholder="Nombre (opcional)" value={form.nombre} onChange={e=>handleChange('nombre',e.target.value)} className="w-full bg-[#FFF9F2] border border-[#E07A5F]/20 rounded-full px-4 py-2 text-sm" />
                 <div className="grid grid-cols-2 gap-2">
                   <select value={form.especie} onChange={e=>handleChange('especie',e.target.value)} className="bg-[#FFF9F2] border border-[#E07A5F]/20 rounded-full px-3 py-2 text-sm">
                     <option value="perro">🐕 Perro</option><option value="gato">🐈 Gato</option><option value="otro">🐾 Otro</option>
                   </select>
-                  <input placeholder="Raza (opcional)" value={form.raza} onChange={e=>handleChange('raza',e.target.value)} className="bg-[#FFF9F2] border border-[#E07A5F]/20 rounded-full px-3 py-2 text-sm" />
+                  <input placeholder="Raza" value={form.raza} onChange={e=>handleChange('raza',e.target.value)} className="bg-[#FFF9F2] border border-[#E07A5F]/20 rounded-full px-3 py-2 text-sm" />
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <input placeholder="Color(es) *" value={form.color} onChange={e=>handleChange('color',e.target.value)} className="bg-[#FFF9F2] border border-[#E07A5F]/20 rounded-full px-3 py-2 text-sm" required />
@@ -610,32 +439,44 @@
                     <option value="pequeño">Pequeño</option><option value="mediano">Mediano</option><option value="grande">Grande</option>
                   </select>
                 </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <select value={form.sexo} onChange={e=>handleChange('sexo',e.target.value)} className="bg-[#FFF9F2] border border-[#E07A5F]/20 rounded-full px-3 py-2 text-sm">
+                    <option value="">Sexo (opcional)</option><option value="macho">♂️ Macho</option><option value="hembra">♀️ Hembra</option>
+                  </select>
+                  <input placeholder="Edad (ej: 4 años)" value={form.edad} onChange={e=>handleChange('edad',e.target.value)} className="bg-[#FFF9F2] border border-[#E07A5F]/20 rounded-full px-3 py-2 text-sm" />
+                </div>
+              </div>
+
+              {/* Ubicación y descripción */}
+              <div className="space-y-3 pt-2 border-t border-[#E07A5F]/10">
+                <p className="text-sm font-medium text-[#4A3B32]">📍 Ubicación</p>
                 <select value={form.zona} onChange={e=>handleChange('zona',e.target.value)} className="w-full bg-[#FFF9F2] border border-[#E07A5F]/20 rounded-full px-4 py-2 text-sm" required>
                   {ZONAS.map(z=><option key={z} value={z}>{z}</option>)}
                 </select>
-                <textarea placeholder="Descripción detallada" value={form.descripcion} onChange={e=>handleChange('descripcion',e.target.value)} className="w-full bg-[#FFF9F2] border border-[#E07A5F]/20 rounded-2xl px-4 py-2 text-sm" rows="2"></textarea>
-                
-                {/* Selector de ubicación */}
-                <div>
-                  <label className="block mb-1 text-xs font-medium text-[#8B7A6B]">📍 Ubicación</label>
-                  <LocationPicker 
-                    onSelect={(lat, lng) => { handleChange('lat', lat); handleChange('lng', lng); }}
-                    initialLat={form.lat} initialLng={form.lng}
-                  />
-                  <p className="text-[10px] text-[#8B7A6B] mt-1">Toca el mapa o arrastra el marcador. Usa el botón 📍 para tu ubicación actual.</p>
-                </div>
+                <LocationPicker onSelect={(lat, lng) => { handleChange('lat', lat); handleChange('lng', lng); }} initialLat={form.lat} initialLng={form.lng} />
+                <p className="text-[10px] text-[#8B7A6B]">Toca el mapa o usa 📍 para tu ubicación actual.</p>
+                <textarea placeholder="Descripción detallada *" value={form.descripcion} onChange={e=>handleChange('descripcion',e.target.value)} className="w-full bg-[#FFF9F2] border border-[#E07A5F]/20 rounded-2xl px-4 py-2 text-sm" rows="3" required></textarea>
+              </div>
 
-                <div><label className="block mb-1 text-xs font-medium text-[#8B7A6B]">📸 Foto</label><input type="file" accept="image/*" onChange={handleImage} disabled={processing} className="block w-full text-xs file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:bg-[#E07A5F] file:text-white" />{preview && <img src={preview} className="mt-2 w-24 h-24 object-cover rounded-xl border border-[#E07A5F]/20" />}</div>
-                <div className="grid grid-cols-2 gap-2">
-                  <input placeholder="Tu nombre *" value={form.contactoNombre} onChange={e=>handleChange('contactoNombre',e.target.value)} className="bg-[#FFF9F2] border border-[#E07A5F]/20 rounded-full px-3 py-2 text-sm" required />
-                  <div className="relative">
-                    <input placeholder="Número local *" value={form.contactoTelefonoLocal} onChange={e=>handleChange('contactoTelefonoLocal', e.target.value)} className="w-full bg-[#FFF9F2] border border-[#E07A5F]/20 rounded-full pl-12 pr-3 py-2 text-sm" required />
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8B7A6B] font-medium text-sm">+57</span>
-                  </div>
+              {/* Foto */}
+              <div className="pt-2 border-t border-[#E07A5F]/10">
+                <label className="block mb-1 text-xs font-medium text-[#8B7A6B]">📸 Foto</label>
+                <input type="file" accept="image/*" onChange={handleImage} disabled={processing} className="block w-full text-xs file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:bg-[#E07A5F] file:text-white" />
+                {preview && <img src={preview} className="mt-2 w-24 h-24 object-cover rounded-xl border border-[#E07A5F]/20" />}
+              </div>
+
+              {/* Contacto */}
+              <div className="space-y-3 pt-2 border-t border-[#E07A5F]/10">
+                <p className="text-sm font-medium text-[#4A3B32]">📞 Contacto</p>
+                <input placeholder="Tu nombre *" value={form.contactoNombre} onChange={e=>handleChange('contactoNombre',e.target.value)} className="w-full bg-[#FFF9F2] border border-[#E07A5F]/20 rounded-full px-4 py-2 text-sm" required />
+                <div className="relative">
+                  <input placeholder="Número local *" value={form.contactoTelefonoLocal} onChange={e=>handleChange('contactoTelefonoLocal', e.target.value)} className="w-full bg-[#FFF9F2] border border-[#E07A5F]/20 rounded-full pl-12 pr-3 py-2 text-sm" required />
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8B7A6B] font-medium text-sm">+57</span>
                 </div>
                 <input type="date" value={form.fecha} onChange={e=>handleChange('fecha',e.target.value)} className="w-full bg-[#FFF9F2] border border-[#E07A5F]/20 rounded-full px-4 py-2 text-sm" />
                 {error && <p className="text-[#D9534F] text-xs">{error}</p>}
               </div>
+
               <button type="submit" disabled={sending||processing} className="w-full bg-[#E07A5F] hover:bg-[#C86A50] text-white font-display text-base py-3 rounded-full shadow-md transition">
                 {sending ? 'Enviando...' : '✨ Publicar reporte'}
               </button>
@@ -663,20 +504,14 @@
 
     const App = () => {
       const [activeTab, setActiveTab] = useState('perdidos');
-      const [viewMode, setViewMode] = useState('feed'); // 'feed' o 'map'
+      const [viewMode, setViewMode] = useState('feed');
       const [stats, setStats] = useState({ totalPerdidos: 0, totalAvistamientos: 0, resueltos: 0 });
       const [matchModal, setMatchModal] = useState(null);
       const [selectedPet, setSelectedPet] = useState(null);
 
       useEffect(() => {
-        (async () => {
-          if (GAS_URL) {
-            try { const r = await fetch(`${GAS_URL}?action=stats`); const j = await r.json(); if (j.ok) setStats(j.data); } catch(e) {}
-          }
-        })();
+        (async () => { if (GAS_URL) { try { const r = await fetch(`${GAS_URL}?action=stats`); const j = await r.json(); if (j.ok) setStats(j.data); } catch(e) {} } })();
       }, []);
-
-      const handleCloseReport = () => setActiveTab('perdidos');
 
       return (
         <div className="min-h-screen pb-16">
@@ -684,7 +519,7 @@
           <main className="flex-1">
             {activeTab === 'perdidos' && <FeedView type="perdidos" viewMode={viewMode} onOpenDetail={setSelectedPet} />}
             {activeTab === 'avistamientos' && <FeedView type="avistamientos" viewMode={viewMode} onOpenDetail={setSelectedPet} />}
-            {activeTab === 'reportar' && <ReportForm onMatchFound={setMatchModal} onClose={handleCloseReport} />}
+            {activeTab === 'reportar' && <ReportForm onMatchFound={setMatchModal} onClose={() => setActiveTab('perdidos')} />}
           </main>
           <BottomNavigation activeTab={activeTab} viewMode={viewMode} setViewMode={setViewMode} setActiveTab={setActiveTab} />
           <FloatingActionButton setActiveTab={setActiveTab} />
